@@ -469,6 +469,16 @@ UPDATE users SET role = 'admin' WHERE email = 'admin@steamjek.com';
 - When deploying to production, set environment variables directly on your hosting platform (Railway, Render, etc.) — never use a `.env` file on the server
 - For cloud database hosting, use **NeonDB** (free PostgreSQL) and set `DATABASE_URL` with SSL enabled in `db/index.js`
 
+## Members of Motrakor
+```
+6688006 Kuntapat Asawaworarit
+6688134 Pawaris Traimongkolkul
+6688144 Napat Wiangain
+6688152 Thanadon Yindeesuk
+6688160 Akanat Apiluckpanich
+6688161 Tinnaphob Boonkua
+```
+
 ---
 
 *Built as part of ITCS383 Software Engineering Project — Mahidol University 2025*
