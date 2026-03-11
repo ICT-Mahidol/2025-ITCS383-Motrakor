@@ -748,26 +748,15 @@
               <hr class="divider">
               <div class="oc-row total"><span>Total</span><span class="val" id="total-val">$0.00</span></div>
               <hr class="divider">
-              <div class="pay-title">Payment Details <span>🔒 Encrypted</span></div>
-              <div class="form-group">
-                <label class="form-label">Cardholder Name</label>
-                <input class="form-input" value="Alex Johnson" placeholder="Full name">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Card Number</label>
-                <input class="form-input" value="4242 4242 4242 4242" placeholder="0000 0000 0000 0000" maxlength="19">
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Expiry Date</label>
-                  <input class="form-input" value="12/27" placeholder="MM/YY">
+              <div class="pay-title">Payment Details <span>🔒 Powered by Stripe</span></div>
+              <form id="payment-form">
+                <div id="payment-element" style="background: var(--bg2); padding: 16px; border-radius: 8px; margin-bottom: 16px; min-height: 100px; display: flex; align-items: center; justify-content: center;">
+                  <!-- Stripe Elements will be inserted here -->
+                  <div style="color:var(--muted); text-align:center;">Loading payment system...</div>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">CVV</label>
-                  <input class="form-input" value="123" placeholder="•••" maxlength="4">
-                </div>
-              </div>
-              <button class="btn btn-primary pay-btn" onclick="checkout()">🔒 Purchase Now</button>
+                <div id="payment-message" style="color: var(--red); margin-bottom: 12px; display: none;"></div>
+                <button type="button" class="btn btn-primary pay-btn" id="submit-button" onclick="checkout()" disabled>🔒 Purchase Now</button>
+              </form>
               <div class="ssl-note">🛡️ SSL encrypted · PCI-DSS compliant</div>
             </div>
           </div>
@@ -835,6 +824,7 @@
     </div>
   </div>
 
+  <script src="https://js.stripe.com/v3/"></script>
   <script src="api.js"></script>
   <style>
     /* Modal Styles */
@@ -871,6 +861,8 @@
 
   <script>
     let cartGames = [];
+    let stripe;
+    let elements;
     
     // --- AUTH FLOW ---
     function showAuthModal() { document.getElementById('auth-overlay').style.display = 'flex'; }
@@ -990,65 +982,143 @@
       total.textContent = '$' + cartGames.reduce((s, g) => s + Number(g.price), 0).toFixed(2);
     }
     
-    function remove(id) { 
-        // Remove from local array
-        cartGames = cartGames.filter(g => Number(g.id) !== Number(id)); 
-        
-        // Remove from localStorage array
-        const cartStr = localStorage.getItem('steamjek_cart');
-        if (cartStr) {
-            let lsCart = JSON.parse(cartStr);
-            lsCart = lsCart.filter(cid => Number(cid) !== Number(id));
-            localStorage.setItem('steamjek_cart', JSON.stringify(lsCart));
+    async function remove(id) {
+        try {
+            const res = await apiFetch(`/cart/${id}`, { method: 'DELETE' });
+            if (res) {
+                cartGames = cartGames.filter(g => g.id !== id);
+                renderCart();
+                updateBadges(); // Sync global
+                showToast('Item removed from cart 🗑', 'i');
+                
+                // Re-initialize Stripe to reflect the new cart total
+                if (cartGames.length > 0) {
+                    document.getElementById('submit-button').disabled = true;
+                    document.getElementById('payment-element').innerHTML = '<div style="color:var(--muted); text-align:center;">Updating payment system...</div>';
+                    await initializeStripe();
+                } else {
+                    document.getElementById('payment-element').innerHTML = '';
+                    document.getElementById('submit-button').disabled = true;
+                }
+            }
+        } catch (err) {
+            console.error("Error removing from cart:", err);
         }
-        
-        showToast('Item removed', 'i'); 
-        renderCart(); 
     }
     
-    function checkout() { 
+    async function checkout() { 
         if (!Auth.isAuthenticated()) {
             showToast('Please login to checkout', 'i');
             showAuthModal();
             return;
         }
     
-        if (!cartGames.length) { 
-            showToast('Cart is empty!', 'i'); 
+        if (!cartGames.length || !stripe || !elements) { 
+            showToast('Cart is empty or payment not initialized!', 'i'); 
             return; 
         } 
         
-        // Clear cart
-        cartGames = []; 
-        localStorage.setItem('steamjek_cart', JSON.stringify([]));
+        const btn = document.getElementById('submit-button');
+        const msg = document.getElementById('payment-message');
+        btn.disabled = true;
+        btn.innerHTML = '🔒 Processing...';
+        msg.style.display = 'none';
+        msg.textContent = '';
         
-        renderCart(); 
-        document.getElementById('modal').classList.add('open'); 
+        try {
+            // Confirm the payment with Stripe
+            const { error, paymentIntent } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {},
+                redirect: 'if_required' // We don't want to redirect, we handle success locally
+            });
+
+            if (error) {
+                msg.textContent = error.message;
+                msg.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '🔒 Purchase Now';
+            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                // Now confirm the purchase on our backend
+                const res = await apiFetch('/purchases/confirm', { 
+                    method: 'POST',
+                    body: JSON.stringify({ payment_intent_id: paymentIntent.id })
+                });
+                
+                if (res) {
+                    cartGames = []; 
+                    document.getElementById('payment-element').innerHTML = ''; 
+                    renderCart(); 
+                    document.getElementById('modal').classList.add('open'); 
+                    updateBadges(); // Sync sidebar badges globally
+                }
+            } else {
+                msg.textContent = 'Something went wrong while processing the payment.';
+                msg.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '🔒 Purchase Now';
+            }
+        } catch (err) {
+            console.error("Checkout failed:", err);
+            msg.textContent = 'An unexpected error occurred.';
+            msg.style.display = 'block';
+            btn.disabled = false;
+            btn.innerHTML = '🔒 Purchase Now';
+        }
+    }
+
+    async function initializeStripe() {
+        try {
+            const res = await apiFetch('/purchases/create-payment-intent', { method: 'POST' });
+            if (res && res.clientSecret) {
+                stripe = Stripe('pk_test_51T9lQ02Wal1pR9UuAqIvLDGstnDLSRdHoFKXNPXEYcirPIj5ca9IcXFpUT1hmrjdgQgOqyusWSTGTaUGeRN79zXo00lvAL7zxt');
+                
+                const appearance = {
+                    theme: 'night',
+                    variables: {
+                        colorPrimary: '#00d4ff',
+                        colorBackground: '#0c0f1a',
+                        colorText: '#e2e8f0',
+                        colorDanger: '#ef4444',
+                        fontFamily: 'Rajdhani, sans-serif',
+                        borderRadius: '8px',
+                    }
+                };
+                
+                elements = stripe.elements({ clientSecret: res.clientSecret, appearance });
+                const paymentElement = elements.create('payment');
+                
+                // Clear the loading message
+                document.getElementById('payment-element').innerHTML = '';
+                paymentElement.mount('#payment-element');
+                
+                document.getElementById('submit-button').disabled = false;
+            }
+        } catch (err) {
+            console.error("Failed to initialize Stripe:", err);
+            const el = document.getElementById('payment-element');
+            if (el) el.innerHTML = '<div style="color:var(--red); text-align:center;">Failed to load payment system.</div>';
+        }
     }
 
     async function initPage() {
       updateTopBar();
       
+      if (!Auth.isAuthenticated()) {
+          cartGames = [];
+          renderCart();
+          return;
+      }
+
       try {
-        // Fetch cart ids from local storage
-        const cartStr = localStorage.getItem('steamjek_cart');
-        const cartIds = cartStr ? JSON.parse(cartStr) : [];
-        
-        if (cartIds.length === 0) {
-            cartGames = [];
+        const data = await apiFetch('/cart');
+        if (data) {
+            cartGames = data;
             renderCart();
-            return;
+            if (cartGames.length > 0) {
+                await initializeStripe();
+            }
         }
-
-        // Fetch details for all games in the cart
-        // Ideally there would be a bulk endpoint, but we loop for now
-        const gamePromises = cartIds.map(id => apiFetch(`/games/${id}`).catch(e => null));
-        const results = await Promise.all(gamePromises);
-        
-        // Filter out any failed requests (game not found)
-        cartGames = results.filter(g => g !== null);
-        renderCart();
-
       } catch (e) {
         console.error("Error loading cart:", e);
         showToast('Error loading cart data', 'e');

@@ -1032,7 +1032,19 @@
         
         document.getElementById('meta-genre').innerText = (game.genre || 'UNSPECIFIED').toUpperCase();
         
-        const rating = game.rating || 4.5;
+        // Fetch ratings
+        let avgRating = 0;
+        let totalReviews = 0;
+        try {
+            const ratingData = await apiFetch(`/ratings/${gameId}`);
+            if (ratingData) {
+                avgRating = Number(ratingData.average_rating) || 0;
+                totalReviews = ratingData.total_reviews || 0;
+            }
+        } catch (e) {
+            console.warn("Could not fetch ratings", e);
+        }
+        
         const metaRow = document.getElementById('meta-row');
         // Clear all but genre tag
         const genreTag = metaRow.firstElementChild;
@@ -1042,18 +1054,38 @@
         // Add age tag (fake data for now)
         metaRow.innerHTML += `<span class="tag tag-age-ok">All Ages</span>`;
         // Add stars
-        metaRow.innerHTML += `<div class="stars">${renderStars(Math.round(rating))}<span class="rv">${rating} (Mock Reviews)</span></div>`;
+        metaRow.innerHTML += `<div class="stars">${renderStars(Math.round(avgRating))}<span class="rv">${avgRating.toFixed(1)} (${totalReviews} Reviews)</span></div>`;
 
         document.getElementById('game-desc').innerText = game.description || 'No description available for this game.';
         
         const price = Number(game.price);
         document.getElementById('game-price').innerText = price === 0 ? 'FREE' : '$' + price.toFixed(2);
         
-        // Setup initial cart btn state
-        const cartStr = localStorage.getItem('steamjek_cart');
-        const cartArr = cartStr ? JSON.parse(cartStr) : [];
-        inCart = cartArr.includes(Number(game.id));
+        // Setup initial cart/wish btn state if logged in
+        if (Auth.isAuthenticated()) {
+            const cartItems = await apiFetch('/cart');
+            if (cartItems) {
+                inCart = cartItems.some(item => Number(item.game_id) === Number(gameId));
+            }
+            const wishItems = await apiFetch('/wishlist');
+            if (wishItems) {
+                inWish = wishItems.some(item => Number(item.game_id) === Number(gameId));
+            }
+            const purchases = await apiFetch('/purchases');
+            if (purchases) {
+                inLibrary = purchases.some(item => Number(item.game_id) === Number(gameId));
+            }
+        }
+        
         updateCartBtnUI();
+        updateWishBtnUI();
+        
+        // Render rating section if owned
+        const existingRating = document.getElementById('rating-section-wrap');
+        if (existingRating) existingRating.remove();
+        if (inLibrary) {
+            renderRatingSection(gameId);
+        }
         
         document.getElementById('main-content').style.display = 'block';
 
@@ -1067,8 +1099,15 @@
     function updateCartBtnUI() {
       const b = document.getElementById('cart-btn');
       if (b) {
-        b.textContent = inCart ? '✓ In Cart' : '+ Add to Cart';
-        b.className = inCart ? 'btn btn-ghost' : 'btn btn-primary';
+        if (inLibrary) {
+            b.textContent = '✓ In Library';
+            b.className = 'btn btn-ghost added';
+            b.style.pointerEvents = 'none';
+        } else {
+            b.textContent = inCart ? '✓ In Cart' : '+ Add to Cart';
+            b.className = inCart ? 'btn btn-ghost' : 'btn btn-primary';
+            b.style.pointerEvents = 'auto';
+        }
       }
       
       const dot = document.getElementById('cart-count');
@@ -1079,47 +1118,136 @@
       }
     }
 
-    let inCart = false, inWish = false, rated = 0;
+    function updateWishBtnUI() {
+      const b = document.getElementById('wish-btn'); 
+      if (b) {
+        b.textContent = inWish ? '❤️ Wishlisted' : '❤️ Add to Wishlist'; 
+        b.className = inWish ? 'btn btn-purple' : 'btn btn-ghost'; 
+      }
+    }
+
+    let inCart = false, inWish = false, inLibrary = false, rated = 0;
     
-    function toggleCart() { 
+    async function toggleCart() { 
       if (!Auth.isAuthenticated()) {
         showToast('Please login to add to cart', 'i');
         showAuthModal();
         return;
       }
       
+      if (inLibrary) {
+        showToast('You already own this game', 'i');
+        return;
+      }
+      
       if (!globalGameDetails) return;
       
       const gameId = Number(globalGameDetails.id);
-      let cartArr = [];
-      const cartStr = localStorage.getItem('steamjek_cart');
-      if (cartStr) cartArr = JSON.parse(cartStr);
-      
-      if (cartArr.includes(gameId)) {
-        cartArr = cartArr.filter(id => id !== gameId);
-        inCart = false;
-        showToast('Removed from cart', 'i');
-      } else {
-        cartArr.push(gameId);
-        inCart = true;
-        showToast(`${globalGameDetails.title} added to cart 🛒`, 's');
+      try {
+          if (inCart) {
+              const res = await apiFetch(`/cart/${gameId}`, { method: 'DELETE' });
+              if (res) {
+                  inCart = false;
+                  showToast('Removed from cart', 'i');
+              }
+          } else {
+              const res = await apiFetch('/cart', {
+                  method: 'POST',
+                  body: JSON.stringify({ game_id: gameId })
+              });
+              if (res) {
+                  inCart = true;
+                  showToast(`${globalGameDetails.title} added to cart 🛒`, 's');
+              }
+          }
+          updateCartBtnUI();
+      } catch (err) {
+          console.error("Cart toggle failed:", err);
       }
-      
-      localStorage.setItem('steamjek_cart', JSON.stringify(cartArr));
-      updateCartBtnUI();
     }
     
-    function toggleWish() { 
+    function renderRatingSection(gameId) {
+        const wrap = document.createElement('div');
+        wrap.id = 'rating-section-wrap';
+        wrap.className = 'rating-section';
+        wrap.style.marginTop = '30px';
+        wrap.style.padding = '20px';
+        wrap.style.background = 'var(--panel2)';
+        wrap.style.borderRadius = '12px';
+        wrap.innerHTML = `
+            <h3 style="margin-bottom:15px; color:#fff;">Rate this Game</h3>
+            <div id="interactive-stars" style="font-size:24px; cursor:pointer; margin-bottom:15px;">
+                <span data-val="1" style="color:#444;">★</span><span data-val="2" style="color:#444;">★</span><span data-val="3" style="color:#444;">★</span><span data-val="4" style="color:#444;">★</span><span data-val="5" style="color:#444;">★</span>
+            </div>
+            <textarea id="rating-review" placeholder="Write a review (optional)..." style="width:100%; height:80px; background:var(--bg2); border:1px solid var(--border); color:#fff; border-radius:8px; padding:10px; margin-bottom:15px; font-family:inherit;"></textarea>
+            <button class="btn btn-primary" id="submit-rating-btn">Submit Rating</button>
+        `;
+        document.getElementById('game-desc').parentNode.appendChild(wrap);
+
+        let selectedRating = 0;
+        const stars = wrap.querySelectorAll('#interactive-stars span');
+        
+        function updateInteractiveStars(val) {
+            stars.forEach(s => {
+                s.style.color = Number(s.dataset.val) <= val ? '#fc0' : '#444';
+            });
+        }
+        
+        stars.forEach(s => {
+            s.onmouseover = () => updateInteractiveStars(Number(s.dataset.val));
+            s.onmouseout = () => updateInteractiveStars(selectedRating);
+            s.onclick = () => { selectedRating = Number(s.dataset.val); updateInteractiveStars(selectedRating); };
+        });
+
+        document.getElementById('submit-rating-btn').onclick = async () => {
+            if (selectedRating === 0) return showToast('Please select a star rating', 'e');
+            const review = document.getElementById('rating-review').value;
+            try {
+                const res = await apiFetch(`/ratings/${gameId}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ rating: selectedRating, review })
+                });
+                if (res) {
+                    showToast(res.message || 'Rating submitted!', 's');
+                    initPage(); // Refresh to show new average
+                }
+            } catch (err) {
+                console.error("Failed to rate", err);
+            }
+        };
+    }
+    
+    async function toggleWish() { 
       if (!Auth.isAuthenticated()) {
         showToast('Please login to wishlist games', 'i');
         showAuthModal();
         return;
       }
-      inWish = !inWish; 
-      const b = document.getElementById('wish-btn'); 
-      b.textContent = inWish ? '❤️ Wishlisted' : '❤️ Add to Wishlist'; 
-      b.className = inWish ? 'btn btn-purple' : 'btn btn-ghost'; 
-      showToast(inWish ? 'Added to wishlist ❤️' : 'Removed from wishlist', 'i');
+      
+      if (!globalGameDetails) return;
+      const gameId = Number(globalGameDetails.id);
+
+      try {
+          if (inWish) {
+              const res = await apiFetch(`/wishlist/${gameId}`, { method: 'DELETE' });
+              if (res) {
+                  inWish = false;
+                  showToast('Removed from wishlist', 'i');
+              }
+          } else {
+              const res = await apiFetch('/wishlist', {
+                  method: 'POST',
+                  body: JSON.stringify({ game_id: gameId })
+              });
+              if (res) {
+                  inWish = true;
+                  showToast('Added to wishlist ❤️', 's');
+              }
+          }
+          updateWishBtnUI();
+      } catch (err) {
+          console.error("Wishlist toggle failed:", err);
+      }
     }
     
     const labels = ['', 'Terrible', 'Poor', 'Average', 'Good', 'Excellent'];

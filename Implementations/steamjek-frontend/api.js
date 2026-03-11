@@ -119,5 +119,39 @@ function showToast(msg, type = 'i') {
   setTimeout(() => el.remove(), 3500);
 }
 
-// Auto update sidebar on every page that includes this script
-document.addEventListener('DOMContentLoaded', updateSidebarUser);
+// Updates Cart and Wishlist badges across the sidebar and topbar
+async function updateBadges() {
+  if (!Auth.isAuthenticated()) return;
+
+  try {
+    // We could fetch both in parallel
+    const [cart, wish] = await Promise.all([
+      apiFetch('/cart').catch(() => []),
+      apiFetch('/wishlist').catch(() => [])
+    ]);
+
+    if (cart) {
+      const cartCounts = document.querySelectorAll('.cart-dot, #cart-count, #cart-badge');
+      cartCounts.forEach(el => el.textContent = cart.length);
+      // Also update sidebar cart badge if exists
+      const sbCart = document.querySelector('a[href="page3_cart.html"] .nav-badge');
+      if (sbCart) sbCart.textContent = cart.length;
+    }
+
+    if (wish) {
+      const wishCounts = document.querySelectorAll('#nb, #wish-count');
+      wishCounts.forEach(el => el.textContent = wish.length);
+      // Also update sidebar wishlist badge if exists
+      const sbWish = document.querySelector('a[href="page5_wishlist.html"] .nav-badge');
+      if (sbWish) sbWish.textContent = wish.length;
+    }
+  } catch (err) {
+    console.error("Error updating badges:", err);
+  }
+}
+
+// Auto update sidebar and badges on every page that includes this script
+document.addEventListener('DOMContentLoaded', () => {
+  updateSidebarUser();
+  updateBadges();
+});

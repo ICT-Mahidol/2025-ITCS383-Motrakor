@@ -642,7 +642,7 @@
       <div class="nav-section">Discover</div>
       <a class="nav-link" href="page1_store.html"><span class="nav-icon">🏪</span>Store</a>
       <a class="nav-link active" href="page5_wishlist.html"><span class="nav-icon">❤️</span>Wishlist<span
-          class="nav-badge" id="nb">3</span></a>
+          class="nav-badge" id="nb">0</span></a>
       <div class="nav-section">Library</div>
       <a class="nav-link" href="page6_library.html"><span class="nav-icon">🎮</span>My Games</a>
       <div class="nav-section">Market</div>
@@ -666,7 +666,7 @@
         <div class="pg-hdr">
           <div>
             <div class="pg-title">My <em>Wishlist</em></div>
-            <div class="pg-sub" id="pg-sub">3 games saved for later</div>
+            <div class="pg-sub" id="pg-sub">Loading wishlist...</div>
           </div>
           <a href="page1_store.html" class="btn btn-ghost btn-sm">Browse Store →</a>
         </div>
@@ -674,12 +674,12 @@
         <!-- SUMMARY -->
         <div class="summary-bar">
           <div class="sb-stat">
-            <div class="sb-val" id="sb-count">3</div>
+            <div class="sb-val" id="sb-count">0</div>
             <div class="sb-label">Games</div>
           </div>
           <div class="sb-divider"></div>
           <div class="sb-stat">
-            <div class="sb-val" id="sb-total" style="color:var(--gold)">$79.97</div>
+            <div class="sb-val" id="sb-total" style="color:var(--gold)">$0.00</div>
             <div class="sb-label">Total Value</div>
           </div>
           <div class="sb-divider"></div>
@@ -731,16 +731,22 @@
 
     function render() {
       const list = document.getElementById('wish-list');
-      if (wishlist.length === 0) {
+      if (!wishlist || wishlist.length === 0) {
         list.innerHTML = `<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-title">Your wishlist is empty</div><div class="empty-sub">Browse the store and save games you want to play later</div><a href="page1_store.html" class="btn btn-primary">Browse Store →</a></div>`;
-      } else {
-        list.innerHTML = wishlist.map(row).join('');
+        document.getElementById('pg-sub').textContent = `Your wishlist is currently empty`;
+        document.getElementById('sb-count').textContent = '0';
+        document.getElementById('sb-total').textContent = '$0.00';
+        if (document.getElementById('nb')) document.getElementById('nb').textContent = '0';
+        return;
       }
-      const total = wishlist.reduce((s, g) => s + Number(g.price), 0);
+
+      list.innerHTML = wishlist.map(row).join('');
+      
+      const total = wishlist.reduce((s, g) => s + Number(g.price || 0), 0);
       document.getElementById('pg-sub').textContent = `${wishlist.length} game${wishlist.length !== 1 ? 's' : ''} saved for later`;
       document.getElementById('sb-count').textContent = wishlist.length;
       document.getElementById('sb-total').textContent = '$' + total.toFixed(2);
-      document.getElementById('nb').textContent = wishlist.length;
+      if (document.getElementById('nb')) document.getElementById('nb').textContent = wishlist.length;
     }
 
     async function initPage() {

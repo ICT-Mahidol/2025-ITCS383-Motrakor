@@ -828,7 +828,7 @@
       <a class="nav-link" href="page7_profile.html"><span class="nav-icon">👤</span>Profile</a>
       <a class="nav-link" href="page3_cart.html"><span class="nav-icon">🛒</span>Cart<span
           class="nav-badge" id="cart-badge">0</span></a>
-      <div class="sidebar-foot" id="user-context">
+      <div class="sidebar-foot" id="user-context"></div>
         <div class="user-pill" onclick="Auth.logout()">
           <div class="u-av">??</div>
           <div>
@@ -928,13 +928,14 @@
   </div>
   <div class="toasts" id="toasts"></div>
 
+  <script src="api.js"></script>
   <script>
     let ALL_LISTINGS = [];
     let MY_ITEMS = [];
     let curFilter = 'all';
 
     async function init() {
-      updateUserUI();
+      updateSidebarUser();
       loadListings();
       if (Auth.isAuthenticated()) {
         loadMyListings();
@@ -946,20 +947,8 @@
     }
 
     function updateUserUI() {
-      const user = Auth.getUser();
-      const sidebarPill = document.getElementById('user-context');
-      if (user && sidebarPill) {
-        const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
-        sidebarPill.innerHTML = `
-          <div class="user-pill" onclick="Auth.logout()">
-            <div class="u-av">${initials}</div>
-            <div>
-              <div class="u-name">${user.name}</div>
-              <div class="u-bal">Credit: $100.00</div>
-            </div>
-          </div>
-        `;
-      }
+      // Delegated to api.js updateSidebarUser
+      updateSidebarUser();
     }
 
     async function loadListings() {

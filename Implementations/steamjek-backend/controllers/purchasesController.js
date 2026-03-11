@@ -6,7 +6,7 @@ const getPurchases = async (req, res) => {
   const user_id = req.user.id;
   try {
     const result = await pool.query(
-      `SELECT purchases.id, games.title, games.cover_image,
+      `SELECT purchases.id, purchases.game_id, games.title, games.cover_image,
               purchases.amount, purchases.purchased_at
        FROM purchases
        JOIN games ON purchases.game_id = games.id
