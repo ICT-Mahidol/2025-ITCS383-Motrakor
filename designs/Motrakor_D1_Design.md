@@ -69,9 +69,7 @@ The Component diagram applies the **single responsibility principle (SRP)** with
 
 ---
 
-# **SteamJek — Usecase Diagram**
-
-# SteamJek — Use Case Diagram Description
+# SteamJek — Usecase Diagram Description
 
 ---
 
