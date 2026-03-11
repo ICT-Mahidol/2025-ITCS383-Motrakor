@@ -1,84 +1,94 @@
 # SteamJek — Digital Game Distribution Platform
 
-> A Steam-like digital game distribution platform built for third-party and indie game developers. Built with Node.js, Express, and PostgreSQL.
+> A Steam-like digital game distribution platform for Windows PC, built for third-party and indie game developers to publish, sell, and manage their games.
 
 ---
 
-## 📋 Table of Contents
+## 📋 Project Overview
 
-- [Overview](#overview)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Database Schema](#database-schema)
-- [API Endpoints](#api-endpoints)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Testing](#testing)
+SteamJek is a full-stack digital game distribution platform featuring:
 
----
-
-## Overview
-
-SteamJek is a digital game distribution platform that allows:
-- **Users** to browse, purchase, and play games, manage wishlists, rate games, and trade in-game items
-- **Game Creators** to upload and configure game listings
-- **Administrators** to manage game approvals, users, and platform settings
+- **Game Store** — Browse, search, and purchase games by genre, price, and age rating
+- **Library** — Access purchased games with cloud/local toggle
+- **Shopping Cart** — Add games and checkout with Stripe payment simulation
+- **Wishlist** — Save games for later
+- **Ratings & Reviews** — Rate and review games you own
+- **In-Game Item Marketplace** — Buy and sell in-game items between users
+- **Admin Panel** — Approve/reject game submissions, manage users and purchases
+- **JWT Authentication** — Secure login and registration system
 
 ---
 
-## Tech Stack
+## 🛠 Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Runtime | Node.js v22 |
-| Framework | Express.js |
-| Database | PostgreSQL 16 |
-| Authentication | JWT (jsonwebtoken) |
-| Password Hashing | bcryptjs |
-| Environment Config | dotenv |
-| Dev Server | nodemon |
-| API Testing | Postman |
+| Layer | Technology | Version |
+|---|---|---|
+| Runtime | Node.js | v22 |
+| Framework | Express.js | ^5.2.1 |
+| Database | PostgreSQL | 16 |
+| Authentication | JSON Web Token (JWT) | ^9.0.3 |
+| Password Hashing | bcryptjs | ^3.0.3 |
+| Payment Processing | Stripe | ^20.4.1 |
+| Environment Config | dotenv | ^17.3.1 |
+| Cross-Origin | cors | ^2.8.6 |
+| Dev Server | nodemon | ^3.1.14 |
+| Testing | Jest + Supertest | ^29.7.0 / ^7.0.0 |
+| API Testing | Postman | — |
 
 ---
 
-## Project Structure
+## ✅ Prerequisites
 
-```
-steamjek-backend/
-├── controllers/
-│   ├── authController.js        # Register & Login logic
-│   ├── gamesController.js       # Game CRUD & search
-│   ├── cartController.js        # Shopping cart
-│   ├── purchasesController.js   # Checkout & order history
-│   ├── wishlistController.js    # Wishlist management
-│   ├── ratingsController.js     # Game ratings & reviews
-│   ├── marketController.js      # In-game item marketplace
-│   └── adminController.js       # Admin management
-├── middleware/
-│   ├── auth.js                  # JWT authentication middleware
-│   └── isAdmin.js               # Admin role guard
-├── routes/
-│   ├── auth.js                  # /api/auth
-│   ├── games.js                 # /api/games
-│   ├── cart.js                  # /api/cart
-│   ├── purchases.js             # /api/purchases
-│   ├── wishlist.js              # /api/wishlist
-│   ├── ratings.js               # /api/ratings
-│   ├── market.js                # /api/market
-│   └── admin.js                 # /api/admin
-├── db/
-│   └── index.js                 # PostgreSQL connection pool
-├── .env                         # Environment variables (not committed)
-├── .gitignore
-├── server.js                    # Entry point
-└── package.json
+Before running this project, make sure you have the following installed:
+
+- **Node.js** v18 or higher — https://nodejs.org
+- **PostgreSQL 16** — https://www.postgresql.org/download
+- **Neon Database** (optional, for database management) — https://neon.com/
+- **Git** — https://git-scm.com
+- **Postman** (optional, for API testing) — https://www.postman.com
+- **Stripe Account** (for payment simulation) — https://stripe.com
+
+---
+
+## 🚀 Build & Run Instructions
+
+### 1 — Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/2025-ITCS383-Motrakor.git
+cd Implementations/steamjek-backend
 ```
 
----
+### 2 — Install Dependencies
 
-## Database Schema
+```bash
+npm install
+```
 
-### Users
+### 3 — Configure Environment Variables
+
+Create a `.env` file in the root of `steamjek-backend/`:
+
+```env
+PORT=3000
+JWT_SECRET=your_jwt_secret_key_here
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=steamjek
+DB_USER=postgres
+DB_PASSWORD=your_postgres_password_here
+
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+```
+
+> Get your Stripe test keys from https://dashboard.stripe.com → Developers → API Keys
+
+### 4 — Set Up the Database
+
+Open **pgAdmin 4** or any PostgreSQL client and run the following SQL:
+
 ```sql
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -90,10 +100,7 @@ CREATE TABLE users (
   role VARCHAR(20) DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
 
-### Games
-```sql
 CREATE TABLE games (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
@@ -108,10 +115,7 @@ CREATE TABLE games (
   is_approved BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
 
-### Cart
-```sql
 CREATE TABLE cart (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -119,10 +123,7 @@ CREATE TABLE cart (
   added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(user_id, game_id)
 );
-```
 
-### Purchases
-```sql
 CREATE TABLE purchases (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -130,10 +131,7 @@ CREATE TABLE purchases (
   amount DECIMAL(10,2) NOT NULL,
   purchased_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
 
-### Wishlist
-```sql
 CREATE TABLE wishlist (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -141,10 +139,7 @@ CREATE TABLE wishlist (
   added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(user_id, game_id)
 );
-```
 
-### Ratings
-```sql
 CREATE TABLE ratings (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -154,10 +149,7 @@ CREATE TABLE ratings (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(user_id, game_id)
 );
-```
 
-### Item Types
-```sql
 CREATE TABLE item_types (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -167,10 +159,7 @@ CREATE TABLE item_types (
   rarity VARCHAR(50) DEFAULT 'common',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
 
-### User Items (Inventory)
-```sql
 CREATE TABLE user_items (
   id SERIAL PRIMARY KEY,
   owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -179,10 +168,7 @@ CREATE TABLE user_items (
   acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(owner_id, item_type_id)
 );
-```
 
-### Market Listings
-```sql
 CREATE TABLE market_listings (
   id SERIAL PRIMARY KEY,
   item_type_id INTEGER REFERENCES item_types(id) ON DELETE CASCADE,
@@ -192,10 +178,7 @@ CREATE TABLE market_listings (
   is_sold BOOLEAN DEFAULT false,
   listed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
 
-### Market Transactions
-```sql
 CREATE TABLE market_transactions (
   id SERIAL PRIMARY KEY,
   listing_id INTEGER REFERENCES market_listings(id),
@@ -208,173 +191,284 @@ CREATE TABLE market_transactions (
 );
 ```
 
----
+### 5 — Start the Development Server
 
-## API Endpoints
-
-### 🔐 Auth — `/api/auth`
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/register` | ❌ | Register new user |
-| POST | `/login` | ❌ | Login and get JWT token |
-
-### 🎮 Games — `/api/games`
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/` | ❌ | Get all approved games |
-| GET | `/:id` | ❌ | Get single game |
-| GET | `/search?query=&genre=` | ❌ | Search and filter games |
-| POST | `/` | ✅ | Create new game (creator) |
-
-### 🛒 Cart — `/api/cart`
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/` | ✅ | Get user cart |
-| POST | `/` | ✅ | Add game to cart |
-| DELETE | `/:gameId` | ✅ | Remove game from cart |
-
-### 💳 Purchases — `/api/purchases`
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/` | ✅ | Get purchase history |
-| POST | `/` | ✅ | Checkout cart |
-
-### ❤️ Wishlist — `/api/wishlist`
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/` | ✅ | Get wishlist |
-| POST | `/` | ✅ | Add game to wishlist |
-| DELETE | `/:gameId` | ✅ | Remove from wishlist |
-
-### ⭐ Ratings — `/api/ratings`
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/:gameId` | ❌ | Get ratings for a game |
-| POST | `/:gameId` | ✅ | Rate a game (must own it) |
-
-### ⚔️ Market — `/api/market`
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/listings` | ❌ | Get all active listings |
-| GET | `/my-items` | ✅ | Get user inventory |
-| GET | `/my-listings` | ✅ | Get user's active listings |
-| POST | `/listings` | ✅ | List item for sale |
-| POST | `/buy/:listingId` | ✅ | Buy a listed item |
-
-### 🔧 Admin — `/api/admin`
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/users` | ✅ Admin | Get all users |
-| DELETE | `/users/:id` | ✅ Admin | Delete a user |
-| GET | `/games/pending` | ✅ Admin | Get pending games |
-| PUT | `/games/:id/approve` | ✅ Admin | Approve a game |
-| DELETE | `/games/:id/reject` | ✅ Admin | Reject a game |
-| GET | `/purchases` | ✅ Admin | Get all purchases |
-
----
-
-## Getting Started
-
-### Prerequisites
-- Node.js v18+
-- PostgreSQL 16
-- pgAdmin 4 (optional, for DB management)
-
-### Installation
-
-**1 — Clone the repository**
-```bash
-git clone https://github.com/YOUR_USERNAME/2025-ITCS383-Motrakor.git
-cd Implementations/steamjek-backend
-```
-
-**2 — Install dependencies**
-```bash
-npm install
-```
-
-**3 — Set up environment variables**
-
-Create a `.env` file in the root:
-```
-PORT=3000
-JWT_SECRET=your_secret_key_here
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=steamjek
-DB_USER=postgres
-DB_PASSWORD=your_password_here
-```
-
-**4 — Set up the database**
-
-Open pgAdmin and create a database called `steamjek`, then run all the SQL from the [Database Schema](#database-schema) section above.
-
-**5 — Run the development server**
 ```bash
 npm run dev
 ```
 
-Server will start at `http://localhost:3000` ✅
+Server starts at: **http://localhost:3000** ✅
 
 ---
 
-## Environment Variables
+## ⚠️ Warning
 
-| Variable | Description |
+- **Never commit your `.env` file** — it is listed in `.gitignore` for security
+- **Never share your `STRIPE_SECRET_KEY`** or `JWT_SECRET` publicly
+- All Stripe payments use **test mode only** — no real charges are made
+- The `STRIPE_SECRET_KEY` must start with `sk_test_` for test mode
+- Changing a user's role to `admin` requires re-login to get an updated JWT token
+- Ratings can only be submitted by users who have **purchased** the game
+- Games must be **approved by an admin** before they appear in the public store
+
+---
+
+## 🔌 Default Ports
+
+| Service | Port |
 |---|---|
-| `PORT` | Server port (default 3000) |
-| `JWT_SECRET` | Secret key for JWT signing |
-| `DB_HOST` | PostgreSQL host |
-| `DB_PORT` | PostgreSQL port (default 5432) |
-| `DB_NAME` | Database name |
-| `DB_USER` | Database user |
-| `DB_PASSWORD` | Database password |
+| Express Backend | 3000 |
+| PostgreSQL | 5432 |
+
 
 ---
 
-## Testing
+## 📡 API Endpoints with Postman
 
-All endpoints were tested using **Postman**.
+All endpoints are prefixed with `/api`
 
-### Authentication
-Include JWT token in request headers for protected routes:
+### 🔐 Auth — `/api/auth`
+
+| Method | Endpoint | Auth Required | Description |
+|---|---|---|---|
+| POST | `/register` | ❌ | Register new user |
+| POST | `/login` | ❌ | Login and receive JWT token |
+
+### 🎮 Games — `/api/games`
+
+| Method | Endpoint | Auth Required | Description |
+|---|---|---|---|
+| GET | `/` | ❌ | Get all approved games |
+| GET | `/:id` | ❌ | Get single game by ID |
+| GET | `/search?query=&genre=` | ❌ | Search and filter games |
+| POST | `/` | ✅ | Create a new game listing |
+
+### 🛒 Cart — `/api/cart`
+
+| Method | Endpoint | Auth Required | Description |
+|---|---|---|---|
+| GET | `/` | ✅ | Get current user's cart |
+| POST | `/` | ✅ | Add game to cart |
+| DELETE | `/:gameId` | ✅ | Remove game from cart |
+
+### 💳 Purchases — `/api/purchases`
+
+| Method | Endpoint | Auth Required | Description |
+|---|---|---|---|
+| GET | `/` | ✅ | Get purchase history |
+| POST | `/create-payment-intent` | ✅ | Create Stripe payment intent |
+| POST | `/confirm` | ✅ | Confirm payment and finalize purchase |
+
+### ❤️ Wishlist — `/api/wishlist`
+
+| Method | Endpoint | Auth Required | Description |
+|---|---|---|---|
+| GET | `/` | ✅ | Get user's wishlist |
+| POST | `/` | ✅ | Add game to wishlist |
+| DELETE | `/:gameId` | ✅ | Remove game from wishlist |
+
+### ⭐ Ratings — `/api/ratings`
+
+| Method | Endpoint | Auth Required | Description |
+|---|---|---|---|
+| GET | `/:gameId` | ❌ | Get all ratings for a game |
+| POST | `/:gameId` | ✅ | Rate a game (must own it) |
+
+### ⚔️ Marketplace — `/api/market`
+
+| Method | Endpoint | Auth Required | Description |
+|---|---|---|---|
+| GET | `/listings` | ❌ | Get all active listings |
+| GET | `/my-items` | ✅ | Get user's item inventory |
+| GET | `/my-listings` | ✅ | Get user's active listings |
+| POST | `/listings` | ✅ | List item for sale |
+| POST | `/buy/:listingId` | ✅ | Purchase a listed item |
+
+### 🔧 Admin — `/api/admin`
+
+| Method | Endpoint | Auth Required | Description |
+|---|---|---|---|
+| GET | `/users` | ✅ Admin | Get all users |
+| DELETE | `/users/:id` | ✅ Admin | Delete a user |
+| GET | `/games/pending` | ✅ Admin | Get pending game approvals |
+| PUT | `/games/:id/approve` | ✅ Admin | Approve a game |
+| DELETE | `/games/:id/reject` | ✅ Admin | Reject a game |
+| GET | `/purchases` | ✅ Admin | Get all platform purchases |
+
+### Authentication Header Format
 ```
-Authorization: Bearer <your_token>
+Authorization: Bearer <your_jwt_token>
 ```
 
-### Getting a Token
+---
+
+## 🧪 Running Backend Tests
+
+### Run All Tests
 ```bash
-POST http://localhost:3000/api/auth/login
-Content-Type: application/json
+npm test
+```
 
-{
-  "email": "test@example.com",
-  "password": "password123"
+### Run a Specific Test File
+```bash
+npx jest tests/auth.test.js
+npx jest tests/games.test.js
+npx jest tests/cart.test.js
+npx jest tests/purchases.test.js
+npx jest tests/wishlist.test.js
+npx jest tests/ratings.test.js
+npx jest tests/market.test.js
+npx jest tests/admin.test.js
+```
+
+### Test Files Location
+```
+tests/
+├── auth.test.js        — Register & Login
+├── games.test.js       — Game CRUD & Search
+├── cart.test.js        — Cart Management
+├── purchases.test.js   — Stripe Payment & Checkout
+├── wishlist.test.js    — Wishlist Management
+├── ratings.test.js     — Game Ratings & Reviews
+├── market.test.js      — Item Marketplace
+└── admin.test.js       — Admin Operations
+```
+
+---
+
+## 📊 Test Results
+```
+Test Suites: 8 passed, 8 total
+Tests:       42 passed, 42 total
+Tests:       42 passed, 42 total
+Snapshots:   0 total
+Time:        4.745 s, estimated 5 s
+```
+---
+
+## 🐛 Common Issues
+
+**`Cart is empty` error during purchases test**
+The cart may have been cleared by a previous test run. The `beforeAll` in `purchases.test.js` clears and re-adds the game automatically. If it still fails, manually verify:
+```sql
+SELECT * FROM cart;
+SELECT * FROM games WHERE is_approved = true;
+```
+
+**`relation "items" does not exist` error**
+You still have the old `items` table structure. Drop and recreate the market tables using the SQL in step 4, then update `controllers/marketController.js` to use `item_types` and `user_items`.
+
+**`Email already registered` in auth tests**
+The test user already exists from a previous run. Auth tests use a timestamped email (`testuser_<timestamp>@example.com`) to avoid this automatically.
+
+**`Payment not completed. Status: requires_payment_method`**
+You created a Payment Intent but haven't confirmed it with a test card. Confirm via Stripe API using `pm_card_visa` before calling `/api/purchases/confirm`.
+
+**`Access denied. Admins only.`**
+The JWT token was issued before the role was updated to admin. Update the role then log in again:
+```sql
+UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
+```
+
+**`No tests found` when running `npm test`**
+Make sure your `package.json` jest config includes:
+```json
+"jest": {
+  "testMatch": ["**/tests/**/*.test.js"]
 }
 ```
 
----
-
-## Non-Functional Requirements
-
-| Requirement | Target |
-|---|---|
-| Concurrent Users | 10,000 |
-| Uptime | 99.999% |
-| Response Time | < 1 second |
-| Security | JWT + bcrypt + AES-256 |
-| Scalability | Horizontal scaling ready |
+**PostgreSQL connection refused**
+Make sure the PostgreSQL service is running. On Windows open **Services** and start `postgresql-x64-16`.
 
 ---
 
-## Branch Strategy
+## 👤 Test Accounts
+
+Register an account via the API, then promote to admin via SQL:
+
+```sql
+UPDATE users SET role = 'admin' WHERE email = 'admin@steamjek.com';
+```
+### Pre-seeded Test Accounts
+
+| Name | Email | Password | Role |
+|---|---|---|---|
+| Alice | alice@example.com | password123 | user |
+
+### Stripe Test Cards
+
+| Card Type | Number | Result |
+|---|---|---|
+| Visa (success) | `4242 4242 4242 4242` | ✅ Payment succeeds |
+| Card declined | `4000 0000 0000 0002` | ❌ Payment declined |
+| Insufficient funds | `4000 0000 0000 9995` | ❌ Insufficient funds |
+
+> Use any future expiry date and any 3-digit CVV
+
+---
+
+## 📁 Repository Structure
 
 ```
-master   → stable, production-ready code
-develop  → active development branch
+2025-ITCS383-Motrakor/
+└── Implementations/
+    └── steamjek-backend/
+        ├── config/
+        │   └── stripe.js               — Stripe client config
+        ├── controllers/
+        │   ├── authController.js        — Register & Login logic
+        │   ├── gamesController.js       — Game CRUD & search
+        │   ├── cartController.js        — Shopping cart
+        │   ├── purchasesController.js   — Checkout & Stripe payment
+        │   ├── wishlistController.js    — Wishlist management
+        │   ├── ratingsController.js     — Game ratings & reviews
+        │   ├── marketController.js      — In-game item marketplace
+        │   └── adminController.js       — Admin management
+        ├── middleware/
+        │   ├── auth.js                  — JWT verification middleware
+        │   └── isAdmin.js               — Admin role guard
+        ├── routes/
+        │   ├── auth.js
+        │   ├── games.js
+        │   ├── cart.js
+        │   ├── purchases.js
+        │   ├── wishlist.js
+        │   ├── ratings.js
+        │   ├── market.js
+        │   └── admin.js
+        ├── db/
+        │   └── index.js                 — PostgreSQL connection pool
+        ├── tests/
+        │   ├── auth.test.js
+        │   ├── games.test.js
+        │   ├── cart.test.js
+        │   ├── purchases.test.js
+        │   ├── wishlist.test.js
+        │   ├── ratings.test.js
+        │   ├── market.test.js
+        │   └── admin.test.js
+        ├── .env                         — Environment variables (not committed)
+        ├── .gitignore
+        ├── server.js                    — Express app entry point
+        ├── package.json
+        └── README.md
 ```
 
 ---
 
-*Built as part of ITCS383 Software Engineering Project — 2025*
+## 📝 Notes
+
+- All Stripe payments run in **test mode** — no real money is charged
+- The `.env` file is excluded from Git via `.gitignore` — never commit it
+- JWT tokens expire after **7 days**
+- Games are **not publicly visible** until approved by an admin (`is_approved = true`)
+- Users can only rate a game they have **purchased**
+- The marketplace uses a **quantity-based inventory system** — one row per item type per user, tracked by quantity
+- Selling an item reduces the seller's quantity; buying increases the buyer's quantity automatically
+- When deploying to production, set environment variables directly on your hosting platform (Railway, Render, etc.) — never use a `.env` file on the server
+- For cloud database hosting, use **NeonDB** (free PostgreSQL) and set `DATABASE_URL` with SSL enabled in `db/index.js`
+
+---
+
+*Built as part of ITCS383 Software Engineering Project — Mahidol University 2025*
