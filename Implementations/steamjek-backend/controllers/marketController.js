@@ -5,11 +5,10 @@ const getListings = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT ml.id, it.name, it.description, it.image_url, 
-              it.rarity, ml.price, ml.quantity,
-              u.name as seller_name, g.title as game_title,
+              ml.price, u.name as seller_name, g.title as game_title,
               ml.listed_at
        FROM market_listings ml
-       JOIN item_types it ON ml.item_type_id = it.id
+       JOIN items it ON ml.item_id = it.id
        JOIN users u ON ml.seller_id = u.id
        JOIN games g ON it.game_id = g.id
        WHERE ml.is_sold = false
@@ -22,17 +21,17 @@ const getListings = async (req, res) => {
   }
 };
 
-// GET MY ITEMS (inventory)
+// GET MY ITEMS (inventory that ARE NOT listed)
 const getMyItems = async (req, res) => {
   const owner_id = req.user.id;
   try {
+    // Get items owned by user that are not currently active in a listing
     const result = await pool.query(
-      `SELECT ui.id, it.name, it.description, it.image_url,
-              it.rarity, ui.quantity, g.title as game_title
-       FROM user_items ui
-       JOIN item_types it ON ui.item_type_id = it.id
+      `SELECT it.id, it.name, it.description, it.image_url, g.title as game_title
+       FROM items it
        JOIN games g ON it.game_id = g.id
-       WHERE ui.owner_id = $1 AND ui.quantity > 0`,
+       WHERE it.owner_id = $1 
+       AND it.id NOT IN (SELECT item_id FROM market_listings WHERE is_sold = false)`,
       [owner_id]
     );
     res.json(result.rows);
@@ -42,14 +41,14 @@ const getMyItems = async (req, res) => {
   }
 };
 
-// GET MY LISTINGS
+// GET MY ACTIVE LISTINGS
 const getMyListings = async (req, res) => {
   const seller_id = req.user.id;
   try {
     const result = await pool.query(
-      `SELECT ml.*, it.name as item_name, it.image_url, it.rarity
+      `SELECT ml.*, it.name as item_name, it.image_url
        FROM market_listings ml
-       JOIN item_types it ON ml.item_type_id = it.id
+       JOIN items it ON ml.item_id = it.id
        WHERE ml.seller_id = $1 AND ml.is_sold = false
        ORDER BY ml.listed_at DESC`,
       [seller_id]
@@ -64,30 +63,35 @@ const getMyListings = async (req, res) => {
 // CREATE LISTING (sell an item)
 const createListing = async (req, res) => {
   const seller_id = req.user.id;
-  const { item_type_id, quantity, price } = req.body;
+  const { item_id, price } = req.body;
   try {
-    // Check if user owns enough of this item
-    const userItem = await pool.query(
-      'SELECT * FROM user_items WHERE owner_id = $1 AND item_type_id = $2',
-      [seller_id, item_type_id]
+    // Check if user owns this item
+    const item = await pool.query(
+      'SELECT * FROM items WHERE id = $1 AND owner_id = $2',
+      [item_id, seller_id]
     );
-    if (userItem.rows.length === 0 || userItem.rows[0].quantity < quantity) {
-      return res.status(403).json({ 
-        message: 'You do not have enough of this item' 
+    if (item.rows.length === 0) {
+      return res.status(403).json({
+        message: 'You do not own this item'
       });
     }
 
-    // Deduct quantity from inventory
-    await pool.query(
-      'UPDATE user_items SET quantity = quantity - $1 WHERE owner_id = $2 AND item_type_id = $3',
-      [quantity, seller_id, item_type_id]
+    // Check if it's already listed
+    const existingListing = await pool.query(
+      'SELECT * FROM market_listings WHERE item_id = $1 AND is_sold = false',
+      [item_id]
     );
+    if (existingListing.rows.length > 0) {
+      return res.status(400).json({
+        message: 'Item is already listed'
+      });
+    }
 
     // Create listing
     const listing = await pool.query(
-      `INSERT INTO market_listings (item_type_id, seller_id, quantity, price)
-       VALUES ($1, $2, $3, $4) RETURNING *`,
-      [item_type_id, seller_id, quantity, price]
+      `INSERT INTO market_listings (item_id, seller_id, price)
+       VALUES ($1, $2, $3) RETURNING *`,
+      [item_id, seller_id, price]
     );
     res.status(201).json({
       message: 'Item listed successfully',
@@ -110,27 +114,24 @@ const buyItem = async (req, res) => {
       [listingId]
     );
     if (listing.rows.length === 0) {
-      return res.status(404).json({ 
-        message: 'Listing not found or already sold' 
+      return res.status(404).json({
+        message: 'Listing not found or already sold'
       });
     }
 
-    const { item_type_id, seller_id, quantity, price } = listing.rows[0];
+    const { item_id, seller_id, price } = listing.rows[0];
 
     // Prevent buying your own item
     if (seller_id === buyer_id) {
-      return res.status(400).json({ 
-        message: 'You cannot buy your own item' 
+      return res.status(400).json({
+        message: 'You cannot buy your own item'
       });
     }
 
-    // Add item to buyer inventory
+    // Update item owner
     await pool.query(
-      `INSERT INTO user_items (owner_id, item_type_id, quantity)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (owner_id, item_type_id) 
-       DO UPDATE SET quantity = user_items.quantity + $3`,
-      [buyer_id, item_type_id, quantity]
+      'UPDATE items SET owner_id = $1 WHERE id = $2',
+      [buyer_id, item_id]
     );
 
     // Mark listing as sold
@@ -142,15 +143,14 @@ const buyItem = async (req, res) => {
     // Record transaction
     await pool.query(
       `INSERT INTO market_transactions 
-        (listing_id, buyer_id, seller_id, item_type_id, quantity, price)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [listingId, buyer_id, seller_id, item_type_id, quantity, price]
+        (listing_id, buyer_id, seller_id, item_id, price)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [listingId, buyer_id, seller_id, item_id, price]
     );
 
     res.json({
       message: 'Item purchased successfully',
-      item_type_id,
-      quantity,
+      item_id,
       price
     });
   } catch (err) {
@@ -159,10 +159,10 @@ const buyItem = async (req, res) => {
   }
 };
 
-module.exports = { 
-  getListings, 
-  createListing, 
-  buyItem, 
+module.exports = {
+  getListings,
+  createListing,
+  buyItem,
   getMyItems,
   getMyListings
 };
