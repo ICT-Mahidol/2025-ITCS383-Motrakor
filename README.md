@@ -412,47 +412,85 @@ UPDATE users SET role = 'admin' WHERE email = 'admin@steamjek.com';
 
 ```
 2025-ITCS383-Motrakor/
+├── README.md                           — Project documentation (this file)
+├── Motrakor_D3_AILog.md                — AI log and development notes
+├── sonar-project.properties            — SonarQube configuration
+├── steamjekDB.sql                      — Database schema and seed data
+│
+├── designs/
+│   └── Motrakor_D1_Design.md           — Design document and architecture
+│
 └── Implementations/
-    └── steamjek-backend/
-        ├── config/
-        │   └── stripe.js               — Stripe client config
-        ├── controllers/
-        │   ├── authController.js        — Register & Login logic
-        │   ├── gamesController.js       — Game CRUD & search
-        │   ├── cartController.js        — Shopping cart
-        │   ├── purchasesController.js   — Checkout & Stripe payment
-        │   ├── wishlistController.js    — Wishlist management
-        │   ├── ratingsController.js     — Game ratings & reviews
-        │   ├── marketController.js      — In-game item marketplace
-        │   └── adminController.js       — Admin management
-        ├── middleware/
-        │   ├── auth.js                  — JWT verification middleware
-        │   └── isAdmin.js               — Admin role guard
-        ├── routes/
-        │   ├── auth.js
-        │   ├── games.js
-        │   ├── cart.js
-        │   ├── purchases.js
-        │   ├── wishlist.js
-        │   ├── ratings.js
-        │   ├── market.js
-        │   └── admin.js
-        ├── db/
-        │   └── index.js                 — PostgreSQL connection pool
-        ├── tests/
-        │   ├── auth.test.js
-        │   ├── games.test.js
-        │   ├── cart.test.js
-        │   ├── purchases.test.js
-        │   ├── wishlist.test.js
-        │   ├── ratings.test.js
-        │   ├── market.test.js
-        │   └── admin.test.js
-        ├── .env                         — Environment variables (not committed)
-        ├── .gitignore
-        ├── server.js                    — Express app entry point
-        ├── package.json
-        └── README.md
+    ├── test/                           — Test utilities
+    │
+    ├── steamjek-backend/               — Express.js Backend Server
+    │   ├── config/
+    │   │   └── stripe.js               — Stripe payment client config
+    │   │
+    │   ├── controllers/                — Business logic handlers
+    │   │   ├── authController.js       — Register & Login logic
+    │   │   ├── gamesController.js      — Game CRUD & search operations
+    │   │   ├── cartController.js       — Shopping cart management
+    │   │   ├── purchasesController.js  — Checkout & Stripe payment processing
+    │   │   ├── wishlistController.js   — User wishlist management
+    │   │   ├── ratingsController.js    — Game ratings & reviews
+    │   │   ├── marketController.js     — In-game item marketplace
+    │   │   └── adminController.js      — Admin dashboard operations
+    │   │
+    │   ├── middleware/                 — Express middleware
+    │   │   ├── auth.js                 — JWT verification & authentication
+    │   │   └── isAdmin.js              — Admin role authorization guard
+    │   │
+    │   ├── routes/                     — API route definitions
+    │   │   ├── auth.js                 — /api/auth endpoints
+    │   │   ├── games.js                — /api/games endpoints
+    │   │   ├── cart.js                 — /api/cart endpoints
+    │   │   ├── purchases.js            — /api/purchases endpoints
+    │   │   ├── wishlist.js             — /api/wishlist endpoints
+    │   │   ├── ratings.js              — /api/ratings endpoints
+    │   │   ├── market.js               — /api/market endpoints
+    │   │   └── admin.js                — /api/admin endpoints
+    │   │
+    │   ├── db/                         — Database configuration
+    │   │   ├── index.js                — PostgreSQL connection pool
+    │   │   ├── setup.sql               — Initial database schema
+    │   │   └── migrate_v2.sql          — Database migration scripts
+    │   │
+    │   ├── tests/                      — Jest unit & integration tests
+    │   │   ├── auth.test.js            — Authentication tests
+    │   │   ├── games.test.js           — Games endpoint tests
+    │   │   ├── cart.test.js            — Shopping cart tests
+    │   │   ├── purchases.test.js       — Stripe payment tests
+    │   │   ├── wishlist.test.js        — Wishlist tests
+    │   │   ├── ratings.test.js         — Ratings endpoint tests
+    │   │   ├── market.test.js          — Marketplace tests
+    │   │   ├── admin.test.js           — Admin operations tests
+    │   │   ├── setup.js                — Test environment setup
+    │   │   └── smoke-test.js           — Smoke test suite
+    │   │
+    │   ├── .env                        — Environment variables (GITIGNORE)
+    │   ├── .gitignore                  — Git ignore rules
+    │   ├── server.js                   — Express app entry point
+    │   ├── package.json                — NPM dependencies & scripts
+    │   ├── check_db.js                 — Database connection checker
+    │   ├── db_seed.js                  — Database seeding script
+    │   ├── migrate.js                  — Database migration runner
+    │   ├── seed.js                     — Seed script for test data
+    │   └── test-wishlist.js            — Wishlist feature testing
+    │
+    └── steamjek-frontend/              — Vanilla JavaScript Frontend
+        ├── api.js                      — Frontend API client (XHR calls)
+        ├── main.js                     — Global app logic & utilities
+        ├── package.json                — Frontend dependencies
+        │
+        └── HTML Pages/
+            ├── page1_store.html        — Game store & catalog
+            ├── page2_game_detail.html  — Individual game details
+            ├── page3_cart.html         — Shopping cart page
+            ├── page4_marketplace.html  — In-game item marketplace
+            ├── page5_wishlist.html     — User wishlist page
+            ├── page6_library.html      — Purchased games library
+            └── page7_profile.html      — User profile & account page
 ```
 
 ---
