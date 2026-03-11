@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SteamJek — Profile</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090f;
+      --bg2: #0c0f1a;
+      --panel: #131b2e;
+      --panel2: #1a2540;
+      --border: #1e2d4a;
+      --border2: #253656;
+      --accent: #00d4ff;
+      --accent2: #7c3aed;
+      --gold: #f59e0b;
+      --red: #ef4444;
+      --green: #10b981;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --muted2: #94a3b8;
+      --fw: 'Rajdhani', sans-serif;
+      --fb: 'Exo 2', sans-serif;
+      --fm: 'JetBrains Mono', monospace
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fb);
+      min-height: 100vh
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg2)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 3px
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh
+    }
+
+    .sidebar {
+      width: 230px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100
+    }
+
+    .main {
+      margin-left: 230px;
+      flex: 1
+    }
+
+    .logo {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .logo-text {
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 1px
+    }
+
+    .logo-text em {
+      color: var(--accent);
+      font-style: normal
+    }
+
+    .nav-section {
+      padding: 16px 20px 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      color: var(--muted);
+      text-transform: uppercase
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 20px;
+      color: var(--muted2);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all .2s;
+      text-decoration: none
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, .03)
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(0, 212, 255, .06)
+    }
+
+    .nav-icon {
+      font-size: 16px;
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--accent2);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-family: var(--fm)
+    }
+
+    .sidebar-foot {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: auto
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--panel);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .2s;
+      border: 1px solid var(--border);
+      text-decoration: none
+    }
+
+    .user-pill:hover {
+      background: var(--panel2)
+    }
+
+    .u-av {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0
+    }
+
+    .u-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .u-bal {
+      font-size: 11px;
+      color: var(--gold);
+      font-family: var(--fm)
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 62px;
+      background: rgba(7, 9, 15, .92);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 28px
+    }
+
+    .tb-title {
+      font-family: var(--fw);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: .5px
+    }
+
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--fb);
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+      text-decoration: none;
+      letter-spacing: .2px
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000
+    }
+
+    .btn-primary:hover {
+      background: #22e0ff;
+      box-shadow: 0 0 22px rgba(0, 212, 255, .35)
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted2);
+      border: 1px solid var(--border)
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--muted);
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .btn-sm {
+      padding: 6px 13px;
+      font-size: 12px
+    }
+
+    .content {
+      padding: 28px
+    }
+
+    /* PROFILE HERO */
+    .profile-hero {
+      background: linear-gradient(135deg, var(--panel) 0%, var(--panel2) 100%);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .profile-hero::before {
+      content: '';
+      position: absolute;
+      top: -60%;
+      right: -5%;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 212, 255, .07) 0%, transparent 70%);
+      pointer-events: none
+    }
+
+    .profile-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -40%;
+      left: 20%;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124, 58, 237, .06) 0%, transparent 70%);
+      pointer-events: none
+    }
+
+    .pf-av {
+      width: 88px;
+      height: 88px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 36px;
+      flex-shrink: 0;
+      box-shadow: 0 0 32px rgba(0, 212, 255, .2)
+    }
+
+    .pf-info {
+      flex: 1;
+      position: relative
+    }
+
+    .pf-name {
+      font-family: var(--fw);
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 4px
+    }
+
+    .pf-email {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px
+    }
+
+    .pf-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .pbadge {
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .5px
+    }
+
+    .pb-cyan {
+      background: rgba(0, 212, 255, .1);
+      color: var(--accent);
+      border: 1px solid rgba(0, 212, 255, .22)
+    }
+
+    .pb-purple {
+      background: rgba(124, 58, 237, .1);
+      color: #a78bfa;
+      border: 1px solid rgba(124, 58, 237, .22)
+    }
+
+    .pb-gold {
+      background: rgba(245, 158, 11, .1);
+      color: var(--gold);
+      border: 1px solid rgba(245, 158, 11, .22)
+    }
+
+    .pf-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+      position: relative
+    }
+
+    /* STATS */
+    .pf-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px
+    }
+
+    .ps-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      text-align: center
+    }
+
+    .ps-val {
+      font-family: var(--fw);
+      font-size: 28px;
+      font-weight: 700
+    }
+
+    .ps-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px
+    }
+
+    /* 2-COL LAYOUT */
+    .pf-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 22px;
+      align-items: start
+    }
+
+    /* SECTION CARD */
+    .sec-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 0
+    }
+
+    .sec-title {
+      font-family: var(--fw);
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px
+    }
+
+    .tab {
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted2);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all .2s
+    }
+
+    .tab:hover {
+      color: var(--text)
+    }
+
+    .tab.on {
+      color: var(--accent);
+      border-bottom-color: var(--accent)
+    }
+
+    /* ACTIVITY FEED */
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .activity-item:last-child {
+      border-bottom: none
+    }
+
+    .act-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--panel2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0
+    }
+
+    .act-text {
+      flex: 1;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted2)
+    }
+
+    .act-text strong {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    .act-time {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--fm)
+    }
+
+    /* PAYMENT */
+    .pay-card-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .pay-card-item:last-child {
+      border-bottom: none
+    }
+
+    .pay-icon {
+      font-size: 22px;
+      width: 36px;
+      text-align: center;
+      flex-shrink: 0
+    }
+
+    .pay-info {
+      flex: 1
+    }
+
+    .pay-name {
+      font-size: 14px;
+      font-weight: 600
+    }
+
+    .pay-exp {
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    .pay-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 4px;
+      background: rgba(16, 185, 129, .1);
+      color: var(--green)
+    }
+
+    /* SECURITY */
+    .sec-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px
+    }
+
+    .sec-row:last-child {
+      border-bottom: none
+    }
+
+    .sec-row-label {
+      color: var(--muted2)
+    }
+
+    .sec-ok {
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(16, 185, 129, .1);
+      padding: 2px 9px;
+      border-radius: 4px
+    }
+
+    .sec-warn {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(245, 158, 11, .1);
+      padding: 2px 9px;
+      border-radius: 4px
+    }
+
+    /* ACCOUNT SETTINGS FORM */
+    .form-group {
+      margin-bottom: 14px
+    }
+
+    .form-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 7px
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: var(--fb);
+      font-size: 13px;
+      outline: none;
+      transition: border-color .2s
+    }
+
+    .form-input:focus {
+      border-color: var(--accent)
+    }
+
+    /* TOAST */
+    .toasts {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .tst {
+      background: var(--panel2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 280px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
+      animation: slideIn .3s ease
+    }
+
+    .tst.s {
+      border-left: 3px solid var(--green)
+    }
+
+    .tst.i {
+      border-left: 3px solid var(--accent)
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .content>* {
+      animation: fadeUp .4s ease both
+    }
+
+    .content>*:nth-child(1) {
+      animation-delay: .04s
+    }
+
+    .content>*:nth-child(2) {
+      animation-delay: .1s
+    }
+
+    .content>*:nth-child(3) {
+      animation-delay: .16s
+    }
+
+    .content>*:nth-child(4) {
+      animation-delay: .22s
+    }
+
+    .tab-panel {
+      display: none
+    }
+
+    .tab-panel.on {
+      display: block
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="logo">
+        <div class="logo-mark">SJ</div>
+        <div class="logo-text">Steam<em>Jek</em></div>
+      </div>
+      <div class="nav-section">Discover</div>
+      <a class="nav-link" href="page1_store.html"><span class="nav-icon">🏪</span>Store</a>
+      <a class="nav-link" href="page5_wishlist.html"><span class="nav-icon">❤️</span>Wishlist<span
+          class="nav-badge">3</span></a>
+      <div class="nav-section">Library</div>
+      <a class="nav-link" href="page6_library.html"><span class="nav-icon">🎮</span>My Games</a>
+      <div class="nav-section">Market</div>
+      <a class="nav-link" href="page4_marketplace.html"><span class="nav-icon">⚔️</span>Item Market</a>
+      <div class="nav-section">Account</div>
+      <a class="nav-link active" href="page7_profile.html"><span class="nav-icon">👤</span>Profile</a>
+      <a class="nav-link" href="page3_cart.html"><span class="nav-icon">🛒</span>Cart<span
+          class="nav-badge">2</span></a>
+      <div class="sidebar-foot">
+        <a href="page7_profile.html" class="user-pill">
+          <div class="u-av">AX</div>
+          <div>
+            <div class="u-name">Alex_Gamer99</div>
+            <div class="u-bal">$124.50</div>
+          </div>
+        </a>
+      </div>
+    </nav>
+    <div class="main">
+      <div class="topbar">
+        <div class="tb-title">👤 Profile</div>
+        <div class="tb-right">
+          <a href="page3_cart.html" class="btn btn-ghost btn-sm">🛒 Cart (2)</a>
+          <button class="btn btn-primary btn-sm" onclick="toast('Changes saved ✓','s')">Save Changes</button>
+        </div>
+      </div>
+      <div class="content">
+        <!-- HERO -->
+        <div class="profile-hero">
+          <div class="pf-av">AX</div>
+          <div class="pf-info">
+            <div class="pf-name">Alex_Gamer99</div>
+            <div class="pf-email">alex.johnson@email.com · Member since Jan 2023</div>
+            <div class="pf-badges">
+              <span class="pbadge pb-cyan">⚡ Early Adopter</span>
+              <span class="pbadge pb-purple">🎮 Veteran</span>
+              <span class="pbadge pb-gold">⭐ Top Reviewer</span>
+              <span class="pbadge pb-cyan">💎 Premium</span>
+            </div>
+          </div>
+          <div class="pf-actions">
+            <button class="btn btn-ghost btn-sm" onclick="toast('Opening avatar editor…','i')">🖼 Change Avatar</button>
+            <button class="btn btn-ghost btn-sm" onclick="switchTab('settings')">✏️ Edit Profile</button>
+          </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="pf-stats">
+          <div class="ps-card">
+            <div class="ps-val" style="color:var(--accent)">24</div>
+            <div class="ps-label">Games Owned</div>
+          </div>
+          <div class="ps-card">
+            <div class="ps-val" style="color:var(--gold)">847h</div>
+            <div class="ps-label">Playtime</div>
+          </div>
+          <div class="ps-card">
+            <div class="ps-val" style="color:var(--green)">$124.50</div>
+            <div class="ps-label">Wallet Balance</div>
+          </div>
+          <div class="ps-card">
+            <div class="ps-val" style="color:#a78bfa">12</div>
+            <div class="ps-label">Reviews Written</div>
+          </div>
+        </div>
+
+        <!-- TABS + CONTENT -->
+        <div class="pf-layout">
+          <div>
+            <div class="sec-card">
+              <div class="tabs">
+                <div class="tab on" onclick="switchTab('activity')">📊 Activity</div>
+                <div class="tab" onclick="switchTab('reviews')">⭐ Reviews</div>
+                <div class="tab" onclick="switchTab('settings')">⚙️ Settings</div>
+              </div>
+
+              <!-- ACTIVITY -->
+              <div class="tab-panel on" id="panel-activity">
+                <div class="activity-item">
+                  <div class="act-icon">🎮</div>
+                  <div class="act-info">
+                    <div class="act-text">Played <strong>NebulaSiege</strong> for 3 hours</div>
+                    <div class="act-time">2 hours ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="act-icon">🛒</div>
+                  <div class="act-info">
+                    <div class="act-text">Purchased <strong>ShadowRift</strong></div>
+                    <div class="act-time">Yesterday</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="act-icon">⭐</div>
+                  <div class="act-info">
+                    <div class="act-text">Rated <strong>BulletZone</strong> 4 stars</div>
+                    <div class="act-time">2 days ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="act-icon">⚔️</div>
+                  <div class="act-info">
+                    <div class="act-text">Sold <strong>Storm Blade +3</strong> for $12.50</div>
+                    <div class="act-time">3 days ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="act-icon">❤️</div>
+                  <div class="act-info">
+                    <div class="act-text">Added <strong>VoidCrawler 2</strong> to wishlist</div>
+                    <div class="act-time">4 days ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="act-icon">🎮</div>
+                  <div class="act-info">
+                    <div class="act-text">Played <strong>PixelFarm</strong> for 5 hours</div>
+                    <div class="act-time">5 days ago</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- REVIEWS -->
+              <div class="tab-panel" id="panel-reviews">
+                <div
+                  style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                    <div>
+                      <div style="font-family:var(--fw);font-size:15px;font-weight:700">NebulaSiege</div>
+                      <div style="font-size:11px;color:var(--muted);font-family:var(--fm)">Feb 12, 2025</div>
+                    </div>
+                    <div style="color:var(--gold);font-size:16px">★★★★★</div>
+                  </div>
+                  <div style="font-size:13px;color:var(--muted2);line-height:1.6;font-weight:300">Absolutely incredible
+                    experience. 200+ hours in and still discovering new mechanics. Best strategy game in a decade.</div>
+                </div>
+                <div
+                  style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                    <div>
+                      <div style="font-family:var(--fw);font-size:15px;font-weight:700">BulletZone</div>
+                      <div style="font-size:11px;color:var(--muted);font-family:var(--fm)">Jan 20, 2025</div>
+                    </div>
+                    <div style="color:var(--gold);font-size:16px">★★★★<span style="color:var(--border)">★</span></div>
+                  </div>
+                  <div style="font-size:13px;color:var(--muted2);line-height:1.6;font-weight:300">Fast-paced and super
+                    fun. The ranked mode is addictive. Wish the campaign was longer but the core gameplay is
+                    exceptional.</div>
+                </div>
+              </div>
+
+              <!-- SETTINGS -->
+              <div class="tab-panel" id="panel-settings">
+                <div class="form-group">
+                  <label class="form-label">Display Name</label>
+                  <input class="form-input" value="Alex_Gamer99">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email Address</label>
+                  <input class="form-input" value="alex.johnson@email.com" type="email">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Full Name</label>
+                  <input class="form-input" value="Alex Johnson">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Address</label>
+                  <input class="form-input" value="123 Gamer Street, Bangkok, TH 10100">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">New Password</label>
+                  <input class="form-input" type="password" placeholder="Leave blank to keep current">
+                </div>
+                <button class="btn btn-primary" onclick="toast('Profile updated ✓','s')" style="margin-top:4px">Save
+                  Changes</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <!-- PAYMENT -->
+            <div class="sec-card">
+              <div class="sec-title">💳 Payment Methods <button class="btn btn-ghost btn-sm"
+                  onclick="toast('Opening card form…','i')" style="font-size:11px;padding:4px 10px">+ Add</button></div>
+              <div class="pay-card-item">
+                <div class="pay-icon">💳</div>
+                <div class="pay-info">
+                  <div class="pay-name">Visa •••• 4242</div>
+                  <div class="pay-exp">Expires 12/27</div>
+                </div>
+                <span class="pay-badge">Default</span>
+              </div>
+              <div class="pay-card-item">
+                <div class="pay-icon">💳</div>
+                <div class="pay-info">
+                  <div class="pay-name">Mastercard •••• 9876</div>
+                  <div class="pay-exp">Expires 08/26</div>
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="toast('Set as default','i')"
+                  style="font-size:11px;padding:4px 10px">Set Default</button>
+              </div>
+            </div>
+
+            <!-- SECURITY -->
+            <div class="sec-card">
+              <div class="sec-title">🔒 Security</div>
+              <div class="sec-row"><span class="sec-row-label">Two-Factor Auth</span><span class="sec-ok">Enabled</span>
+              </div>
+              <div class="sec-row"><span class="sec-row-label">Login Alerts</span><span class="sec-ok">Active</span>
+              </div>
+              <div class="sec-row"><span class="sec-row-label">Last Password Change</span><span class="sec-warn">90 days
+                  ago</span></div>
+              <div class="sec-row"><span class="sec-row-label">Encryption</span><span class="sec-ok">AES-256</span>
+              </div>
+              <button class="btn btn-ghost btn-sm" style="margin-top:14px;width:100%;justify-content:center"
+                onclick="toast('Opening security settings…','i')">Manage Security</button>
+            </div>
+
+            <!-- WALLET -->
+            <div class="sec-card">
+              <div class="sec-title">💰 Wallet</div>
+              <div style="text-align:center;padding:8px 0 16px">
+                <div style="font-family:var(--fw);font-size:40px;font-weight:700;color:var(--gold)">$124.50</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:4px">Available balance</div>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center"
+                onclick="toast('Opening top-up…','i')">+ Add Funds</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toasts" id="toasts"></div>
+
+  <script>
+    function switchTab(id) { document.querySelectorAll('.tab').forEach((t, i) => { const ids = ['activity', 'reviews', 'settings']; t.classList.toggle('on', ids[i] === id) }); document.querySelectorAll('.tab-panel').forEach(p => { p.classList.toggle('on', p.id === 'panel-' + id) }) }
+    function toast(msg, t) { const c = document.getElementById('toasts'); const el = document.createElement('div'); el.className = `tst ${t}`; el.innerHTML = `<span>${t === 's' ? '✅' : 'ℹ️'}</span>${msg}`; c.appendChild(el); setTimeout(() => el.remove(), 3000) }
+  </script>
+</body>
+
+</html>

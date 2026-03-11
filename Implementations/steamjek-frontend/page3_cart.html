@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SteamJek — Cart</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090f;
+      --bg2: #0c0f1a;
+      --panel: #131b2e;
+      --panel2: #1a2540;
+      --border: #1e2d4a;
+      --border2: #253656;
+      --accent: #00d4ff;
+      --accent2: #7c3aed;
+      --gold: #f59e0b;
+      --red: #ef4444;
+      --green: #10b981;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --muted2: #94a3b8;
+      --fw: 'Rajdhani', sans-serif;
+      --fb: 'Exo 2', sans-serif;
+      --fm: 'JetBrains Mono', monospace
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fb);
+      min-height: 100vh
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg2)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 3px
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh
+    }
+
+    .sidebar {
+      width: 230px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100
+    }
+
+    .main {
+      margin-left: 230px;
+      flex: 1
+    }
+
+    .logo {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .logo-text {
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 1px
+    }
+
+    .logo-text em {
+      color: var(--accent);
+      font-style: normal
+    }
+
+    .nav-section {
+      padding: 16px 20px 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      color: var(--muted);
+      text-transform: uppercase
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 20px;
+      color: var(--muted2);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all .2s;
+      text-decoration: none
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, .03)
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(0, 212, 255, .06)
+    }
+
+    .nav-icon {
+      font-size: 16px;
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--accent2);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-family: var(--fm)
+    }
+
+    .sidebar-foot {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: auto
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--panel);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .2s;
+      border: 1px solid var(--border);
+      text-decoration: none
+    }
+
+    .user-pill:hover {
+      background: var(--panel2)
+    }
+
+    .u-av {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0
+    }
+
+    .u-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .u-bal {
+      font-size: 11px;
+      color: var(--gold);
+      font-family: var(--fm)
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 62px;
+      background: rgba(7, 9, 15, .92);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 28px
+    }
+
+    .tb-title {
+      font-family: var(--fw);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: .5px
+    }
+
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--fb);
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+      text-decoration: none;
+      letter-spacing: .2px
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000
+    }
+
+    .btn-primary:hover {
+      background: #22e0ff;
+      box-shadow: 0 0 22px rgba(0, 212, 255, .35)
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted2);
+      border: 1px solid var(--border)
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--muted);
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .btn-sm {
+      padding: 6px 13px;
+      font-size: 12px
+    }
+
+    .cart-wrap {
+      position: relative
+    }
+
+    .cart-dot {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--accent);
+      color: #000;
+      font-size: 9px;
+      font-weight: 700;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fm)
+    }
+
+    .content {
+      padding: 28px
+    }
+
+    /* PAGE HEADER */
+    .pg-header {
+      margin-bottom: 28px
+    }
+
+    .pg-title {
+      font-family: var(--fw);
+      font-size: 28px;
+      font-weight: 700
+    }
+
+    .pg-title em {
+      color: var(--accent);
+      font-style: normal
+    }
+
+    .pg-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    /* CART LAYOUT */
+    .cart-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 26px;
+      align-items: start
+    }
+
+    /* CART ITEMS */
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: border-color .2s
+    }
+
+    .cart-item:hover {
+      border-color: var(--border2)
+    }
+
+    .ci-thumb {
+      width: 80px;
+      height: 62px;
+      border-radius: 8px;
+      background: var(--panel2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      flex-shrink: 0;
+      border: 1px solid var(--border)
+    }
+
+    .ci-info {
+      flex: 1;
+      min-width: 0
+    }
+
+    .ci-title {
+      font-family: var(--fw);
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 2px
+    }
+
+    .ci-dev {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .ci-genre {
+      display: inline-block;
+      background: rgba(0, 212, 255, .08);
+      border: 1px solid rgba(0, 212, 255, .16);
+      color: var(--accent);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      margin-top: 6px;
+      text-transform: uppercase
+    }
+
+    .ci-price {
+      font-family: var(--fw);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gold);
+      flex-shrink: 0
+    }
+
+    .ci-remove {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 7px;
+      border-radius: 7px;
+      transition: all .2s;
+      flex-shrink: 0
+    }
+
+    .ci-remove:hover {
+      color: var(--red);
+      background: rgba(239, 68, 68, .1)
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--muted)
+    }
+
+    .empty-icon {
+      font-size: 52px;
+      margin-bottom: 14px
+    }
+
+    .empty-title {
+      font-family: var(--fw);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--muted2);
+      margin-bottom: 8px
+    }
+
+    .empty-sub {
+      font-size: 13px;
+      margin-bottom: 20px
+    }
+
+    /* ORDER SUMMARY */
+    .order-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px;
+      position: sticky;
+      top: 80px
+    }
+
+    .oc-title {
+      font-family: var(--fw);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .oc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      font-size: 13px;
+      color: var(--muted2);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .oc-row:last-of-type {
+      border-bottom: none
+    }
+
+    .oc-row.total {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .oc-row.total .val {
+      font-family: var(--fw);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--gold)
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 16px 0
+    }
+
+    /* PAYMENT FORM */
+    .pay-title {
+      font-family: var(--fw);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .pay-title span {
+      font-size: 13px;
+      color: var(--green);
+      font-family: var(--fb);
+      font-weight: 500
+    }
+
+    .form-group {
+      margin-bottom: 14px
+    }
+
+    .form-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 7px
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: var(--fm);
+      font-size: 13px;
+      outline: none;
+      transition: border-color .2s
+    }
+
+    .form-input:focus {
+      border-color: var(--accent)
+    }
+
+    .form-input::placeholder {
+      color: var(--muted);
+      font-family: var(--fb)
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    .pay-btn {
+      width: 100%;
+      justify-content: center;
+      padding: 14px;
+      font-size: 15px;
+      margin-top: 6px;
+      border-radius: 9px;
+      letter-spacing: .5px
+    }
+
+    .ssl-note {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px
+    }
+
+    /* MODAL */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .75);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal-bg.open {
+      display: flex
+    }
+
+    .modal {
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 36px;
+      width: 420px;
+      max-width: 90vw;
+      text-align: center;
+      animation: tIn .3s ease
+    }
+
+    .modal-emoji {
+      font-size: 52px;
+      margin-bottom: 12px
+    }
+
+    .modal-title {
+      font-family: var(--fw);
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .modal-sub {
+      font-size: 13px;
+      color: var(--muted2);
+      line-height: 1.6;
+      margin-bottom: 24px
+    }
+
+    @keyframes tIn {
+      from {
+        opacity: 0;
+        transform: scale(.94)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    /* TOAST */
+    .toasts {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .tst {
+      background: var(--panel2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 280px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
+      animation: slideIn .3s ease
+    }
+
+    .tst.s {
+      border-left: 3px solid var(--green)
+    }
+
+    .tst.i {
+      border-left: 3px solid var(--accent)
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .cart-layout {
+      animation: fadeUp .35s ease both
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="logo">
+        <div class="logo-mark">SJ</div>
+        <div class="logo-text">Steam<em>Jek</em></div>
+      </div>
+      <div class="nav-section">Discover</div>
+      <a class="nav-link" href="page1_store.html"><span class="nav-icon">🏪</span>Store</a>
+      <a class="nav-link" href="page5_wishlist.html"><span class="nav-icon">❤️</span>Wishlist<span
+          class="nav-badge">3</span></a>
+      <div class="nav-section">Library</div>
+      <a class="nav-link" href="page6_library.html"><span class="nav-icon">🎮</span>My Games</a>
+      <div class="nav-section">Market</div>
+      <a class="nav-link" href="page4_marketplace.html"><span class="nav-icon">⚔️</span>Item Market</a>
+      <div class="nav-section">Account</div>
+      <a class="nav-link" href="page7_profile.html"><span class="nav-icon">👤</span>Profile</a>
+      <a class="nav-link active" href="page3_cart.html"><span class="nav-icon">🛒</span>Cart<span class="nav-badge"
+          id="nb">2</span></a>
+      <div class="sidebar-foot">
+        <a href="page7_profile.html" class="user-pill">
+          <div class="u-av">AX</div>
+          <div>
+            <div class="u-name">Alex_Gamer99</div>
+            <div class="u-bal">$124.50</div>
+          </div>
+        </a>
+      </div>
+    </nav>
+    <div class="main">
+      <div class="topbar">
+        <div class="tb-title">🛒 Cart</div>
+        <div class="tb-right">
+          <a href="page1_store.html" class="btn btn-ghost btn-sm">← Continue Shopping</a>
+          <a href="page7_profile.html" class="btn btn-primary btn-sm">👤 Profile</a>
+        </div>
+      </div>
+      <div class="content">
+        <div class="pg-header">
+          <div class="pg-title">Your <em>Cart</em></div>
+          <div class="pg-sub" id="cart-sub">2 items ready for purchase</div>
+        </div>
+        <div class="cart-layout">
+          <div>
+            <div id="cart-list"></div>
+          </div>
+          <div>
+            <div class="order-card">
+              <div class="oc-title">Order Summary</div>
+              <div id="oc-rows"></div>
+              <hr class="divider">
+              <div class="oc-row total"><span>Total</span><span class="val" id="total-val">$0.00</span></div>
+              <hr class="divider">
+              <div class="pay-title">Payment Details <span>🔒 Encrypted</span></div>
+              <div class="form-group">
+                <label class="form-label">Cardholder Name</label>
+                <input class="form-input" value="Alex Johnson" placeholder="Full name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Card Number</label>
+                <input class="form-input" value="4242 4242 4242 4242" placeholder="0000 0000 0000 0000" maxlength="19">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Expiry Date</label>
+                  <input class="form-input" value="12/27" placeholder="MM/YY">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">CVV</label>
+                  <input class="form-input" value="123" placeholder="•••" maxlength="4">
+                </div>
+              </div>
+              <button class="btn btn-primary pay-btn" onclick="checkout()">🔒 Purchase Now</button>
+              <div class="ssl-note">🛡️ SSL encrypted · PCI-DSS compliant</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div class="modal-bg" id="modal">
+    <div class="modal">
+      <div class="modal-emoji">🎉</div>
+      <div class="modal-title">Purchase Complete!</div>
+      <div class="modal-sub">Your games have been added to your library and are ready to download. Enjoy your purchase!
+      </div>
+      <a href="page6_library.html" class="btn btn-primary"
+        style="justify-content:center;width:100%;padding:13px;font-size:14px;">Go to My Library →</a>
+    </div>
+  </div>
+  <div class="toasts" id="toasts"></div>
+
+  <script>
+    const GAMES = [
+      { id: 0, title: "NebulaSiege", dev: "StarForge Studios", genre: "strategy", price: 34.99, emoji: "🌌" },
+      { id: 4, title: "VoidHunter", dev: "DarkMatter Dev", genre: "action", price: 29.99, emoji: "🚀" },
+    ];
+    let cart = [...GAMES];
+
+    function render() {
+      const list = document.getElementById('cart-list');
+      const rows = document.getElementById('oc-rows');
+      const sub = document.getElementById('cart-sub');
+      const total = document.getElementById('total-val');
+      document.getElementById('nb').textContent = cart.length;
+      if (cart.length === 0) {
+        list.innerHTML = `<div class="empty-cart"><div class="empty-icon">🛒</div><div class="empty-title">Your cart is empty</div><div class="empty-sub">Add some games from the store to get started</div><a href="page1_store.html" class="btn btn-primary">Browse Store →</a></div>`;
+        rows.innerHTML = ''; total.textContent = '$0.00'; sub.textContent = 'No items'; return;
+      }
+      sub.textContent = `${cart.length} item${cart.length > 1 ? 's' : ''} ready for purchase`;
+      list.innerHTML = cart.map(g => `
+    <div class="cart-item">
+      <div class="ci-thumb">${g.emoji}</div>
+      <div class="ci-info">
+        <div class="ci-title">${g.title}</div>
+        <div class="ci-dev">by ${g.dev}</div>
+        <span class="ci-genre">${g.genre}</span>
+      </div>
+      <div class="ci-price">$${g.price.toFixed(2)}</div>
+      <button class="ci-remove" onclick="remove(${g.id})" title="Remove">✕</button>
+    </div>`).join('');
+      rows.innerHTML = cart.map(g => `<div class="oc-row"><span>${g.title}</span><span>$${g.price.toFixed(2)}</span></div>`).join('');
+      total.textContent = '$' + cart.reduce((s, g) => s + g.price, 0).toFixed(2);
+    }
+    function remove(id) { cart = cart.filter(g => g.id !== id); toast('Item removed', 'i'); render() }
+    function checkout() { if (!cart.length) { toast('Cart is empty!', 'i'); return } cart = []; render(); document.getElementById('modal').classList.add('open') }
+    function toast(msg, t) { const c = document.getElementById('toasts'); const el = document.createElement('div'); el.className = `tst ${t}`; el.innerHTML = `<span>${t === 's' ? '✅' : 'ℹ️'}</span>${msg}`; c.appendChild(el); setTimeout(() => el.remove(), 3000) }
+    render();
+  </script>
+</body>
+
+</html>

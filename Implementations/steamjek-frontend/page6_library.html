@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SteamJek — My Library</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090f;
+      --bg2: #0c0f1a;
+      --panel: #131b2e;
+      --panel2: #1a2540;
+      --border: #1e2d4a;
+      --border2: #253656;
+      --accent: #00d4ff;
+      --accent2: #7c3aed;
+      --gold: #f59e0b;
+      --red: #ef4444;
+      --green: #10b981;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --muted2: #94a3b8;
+      --fw: 'Rajdhani', sans-serif;
+      --fb: 'Exo 2', sans-serif;
+      --fm: 'JetBrains Mono', monospace
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fb);
+      min-height: 100vh
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg2)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 3px
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh
+    }
+
+    .sidebar {
+      width: 230px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100
+    }
+
+    .main {
+      margin-left: 230px;
+      flex: 1
+    }
+
+    .logo {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .logo-text {
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 1px
+    }
+
+    .logo-text em {
+      color: var(--accent);
+      font-style: normal
+    }
+
+    .nav-section {
+      padding: 16px 20px 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      color: var(--muted);
+      text-transform: uppercase
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 20px;
+      color: var(--muted2);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all .2s;
+      text-decoration: none
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, .03)
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(0, 212, 255, .06)
+    }
+
+    .nav-icon {
+      font-size: 16px;
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--accent2);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-family: var(--fm)
+    }
+
+    .sidebar-foot {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: auto
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--panel);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .2s;
+      border: 1px solid var(--border);
+      text-decoration: none
+    }
+
+    .user-pill:hover {
+      background: var(--panel2)
+    }
+
+    .u-av {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0
+    }
+
+    .u-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .u-bal {
+      font-size: 11px;
+      color: var(--gold);
+      font-family: var(--fm)
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 62px;
+      background: rgba(7, 9, 15, .92);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 28px
+    }
+
+    .tb-title {
+      font-family: var(--fw);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: .5px
+    }
+
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--fb);
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+      text-decoration: none;
+      letter-spacing: .2px
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000
+    }
+
+    .btn-primary:hover {
+      background: #22e0ff;
+      box-shadow: 0 0 22px rgba(0, 212, 255, .35)
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted2);
+      border: 1px solid var(--border)
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--muted);
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .btn-sm {
+      padding: 6px 13px;
+      font-size: 12px
+    }
+
+    .content {
+      padding: 28px
+    }
+
+    /* STATS */
+    .lib-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px
+    }
+
+    .ls-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px
+    }
+
+    .ls-val {
+      font-family: var(--fw);
+      font-size: 28px;
+      font-weight: 700
+    }
+
+    .ls-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px
+    }
+
+    /* SEARCH + FILTER ROW */
+    .lib-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 22px;
+      flex-wrap: wrap
+    }
+
+    .lib-search {
+      flex: 1;
+      max-width: 320px;
+      position: relative
+    }
+
+    .lib-search input {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 14px 9px 38px;
+      color: var(--text);
+      font-family: var(--fb);
+      font-size: 13px;
+      outline: none;
+      transition: border-color .2s
+    }
+
+    .lib-search input:focus {
+      border-color: var(--accent)
+    }
+
+    .lib-search input::placeholder {
+      color: var(--muted)
+    }
+
+    .lib-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .fpill {
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted2);
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .fpill:hover {
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .fpill.on {
+      background: rgba(0, 212, 255, .08);
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .view-btns {
+      display: flex;
+      gap: 6px;
+      margin-left: auto
+    }
+
+    .view-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 7px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--muted2);
+      transition: all .2s
+    }
+
+    .view-btn.on {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0, 212, 255, .08)
+    }
+
+    /* GAME CARD (GRID) */
+    .lib-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px
+    }
+
+    .lg-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all .25s
+    }
+
+    .lg-card:hover {
+      border-color: rgba(0, 212, 255, .3);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(0, 212, 255, .07)
+    }
+
+    .lg-thumb {
+      height: 130px;
+      background: var(--panel2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .lg-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 50%, rgba(19, 27, 46, .95) 100%)
+    }
+
+    .lg-body {
+      padding: 14px
+    }
+
+    .lg-genre {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px
+    }
+
+    .lg-title {
+      font-family: var(--fw);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .lg-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .lg-hours {
+      font-size: 11px;
+      color: var(--muted2);
+      font-family: var(--fm)
+    }
+
+    .cloud-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600
+    }
+
+    .cloud-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%
+    }
+
+    .cloud-dot.local {
+      background: var(--accent)
+    }
+
+    .cloud-dot.cloud {
+      background: var(--green)
+    }
+
+    .lg-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px
+    }
+
+    .lg-actions .btn {
+      flex: 1;
+      justify-content: center;
+      padding: 7px;
+      font-size: 12px
+    }
+
+    /* GAME ROW (LIST) */
+    .lib-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .ll-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: all .25s
+    }
+
+    .ll-row:hover {
+      border-color: rgba(0, 212, 255, .3)
+    }
+
+    .ll-thumb {
+      width: 64px;
+      height: 50px;
+      background: var(--panel2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+      border: 1px solid var(--border)
+    }
+
+    .ll-info {
+      flex: 1;
+      min-width: 0
+    }
+
+    .ll-title {
+      font-family: var(--fw);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 2px
+    }
+
+    .ll-dev {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .ll-meta {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+      align-items: center
+    }
+
+    .ll-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent)
+    }
+
+    .ll-hours {
+      font-size: 11px;
+      color: var(--muted2);
+      font-family: var(--fm)
+    }
+
+    .ll-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0
+    }
+
+    .ll-actions {
+      display: flex;
+      gap: 8px
+    }
+
+    /* TOAST */
+    .toasts {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .tst {
+      background: var(--panel2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 280px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
+      animation: slideIn .3s ease
+    }
+
+    .tst.s {
+      border-left: 3px solid var(--green)
+    }
+
+    .tst.i {
+      border-left: 3px solid var(--accent)
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .content>* {
+      animation: fadeUp .4s ease both
+    }
+
+    .content>*:nth-child(1) {
+      animation-delay: .04s
+    }
+
+    .content>*:nth-child(2) {
+      animation-delay: .1s
+    }
+
+    .content>*:nth-child(3) {
+      animation-delay: .16s
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="logo">
+        <div class="logo-mark">SJ</div>
+        <div class="logo-text">Steam<em>Jek</em></div>
+      </div>
+      <div class="nav-section">Discover</div>
+      <a class="nav-link" href="page1_store.html"><span class="nav-icon">🏪</span>Store</a>
+      <a class="nav-link" href="page5_wishlist.html"><span class="nav-icon">❤️</span>Wishlist<span
+          class="nav-badge">3</span></a>
+      <div class="nav-section">Library</div>
+      <a class="nav-link active" href="page6_library.html"><span class="nav-icon">🎮</span>My Games</a>
+      <div class="nav-section">Market</div>
+      <a class="nav-link" href="page4_marketplace.html"><span class="nav-icon">⚔️</span>Item Market</a>
+      <div class="nav-section">Account</div>
+      <a class="nav-link" href="page7_profile.html"><span class="nav-icon">👤</span>Profile</a>
+      <a class="nav-link" href="page3_cart.html"><span class="nav-icon">🛒</span>Cart<span
+          class="nav-badge">2</span></a>
+      <div class="sidebar-foot">
+        <a href="page7_profile.html" class="user-pill">
+          <div class="u-av">AX</div>
+          <div>
+            <div class="u-name">Alex_Gamer99</div>
+            <div class="u-bal">$124.50</div>
+          </div>
+        </a>
+      </div>
+    </nav>
+    <div class="main">
+      <div class="topbar">
+        <div class="tb-title">🎮 My Library</div>
+        <div class="tb-right">
+          <a href="page1_store.html" class="btn btn-primary btn-sm">+ Get More Games</a>
+        </div>
+      </div>
+      <div class="content">
+        <!-- STATS -->
+        <div class="lib-stats">
+          <div class="ls-card">
+            <div class="ls-val" style="color:var(--accent)">24</div>
+            <div class="ls-label">Games Owned</div>
+          </div>
+          <div class="ls-card">
+            <div class="ls-val" style="color:var(--gold)">847h</div>
+            <div class="ls-label">Total Playtime</div>
+          </div>
+          <div class="ls-card">
+            <div class="ls-val" style="color:var(--green)">6</div>
+            <div class="ls-label">Downloaded</div>
+          </div>
+          <div class="ls-card">
+            <div class="ls-val" style="color:#a78bfa">18</div>
+            <div class="ls-label">Cloud Only</div>
+          </div>
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="lib-controls">
+          <div class="lib-search">
+            <span class="lib-search-icon">🔍</span>
+            <input placeholder="Search your library…" id="q" oninput="doSearch(this.value)">
+          </div>
+          <div class="fpill on" onclick="setFilter('all',this)">All</div>
+          <div class="fpill" onclick="setFilter('local',this)">📥 Downloaded</div>
+          <div class="fpill" onclick="setFilter('cloud',this)">☁️ Cloud Only</div>
+          <div class="fpill" onclick="setFilter('recent',this)">🕐 Recently Played</div>
+          <div class="view-btns">
+            <div class="view-btn on" id="vg" onclick="setView('grid')" title="Grid">⊞</div>
+            <div class="view-btn" id="vl" onclick="setView('list')" title="List">≡</div>
+          </div>
+        </div>
+
+        <!-- LIBRARY GRID -->
+        <div id="lib-container"></div>
+      </div>
+    </div>
+  </div>
+  <div class="toasts" id="toasts"></div>
+
+  <script>
+    const GAMES = [
+      { id: 0, title: "NebulaSiege", dev: "StarForge Studios", genre: "strategy", emoji: "🌌", hours: 142, local: false, lastPlayed: "Today" },
+      { id: 1, title: "EcoTycoon", dev: "GreenBit", genre: "strategy", emoji: "🌿", hours: 88, local: false, lastPlayed: "2 days ago" },
+      { id: 2, title: "PixelFarm", dev: "CozyCode", genre: "adventure", emoji: "🌾", hours: 210, local: true, lastPlayed: "Yesterday" },
+      { id: 3, title: "CryptoKnight", dev: "PixelRealm", genre: "rpg", emoji: "⚔️", hours: 15, local: false, lastPlayed: "1 week ago" },
+      { id: 4, title: "PuzzleMind X", dev: "ThinkSoft", genre: "puzzle", emoji: "🧩", hours: 42, local: true, lastPlayed: "3 days ago" },
+      { id: 5, title: "BulletZone", dev: "RapidFire Games", genre: "action", emoji: "💥", hours: 67, local: true, lastPlayed: "Yesterday" },
+      { id: 6, title: "ShadowRift", dev: "Nocturne Games", genre: "adventure", emoji: "🌑", hours: 5, local: false, lastPlayed: "2 weeks ago" },
+    ];
+    let viewMode = 'grid';
+    let cur = 'all';
+
+    function gridCard(g) { return `<div class="lg-card"><div class="lg-thumb"><span style="position:relative;z-index:1">${g.emoji}</span><div class="lg-overlay"></div></div><div class="lg-body"><div class="lg-genre">${g.genre}</div><div class="lg-title">${g.title}</div><div class="lg-footer"><span class="lg-hours">${g.hours}h played</span><span class="cloud-badge"><div class="cloud-dot ${g.local ? 'local' : 'cloud'}"></div>${g.local ? 'Local' : 'Cloud'}</span></div><div class="lg-actions"><button class="btn btn-primary" onclick="play('${g.title}')">▶ Play</button><button class="btn btn-ghost" onclick="toggleLocal(${g.id})" title="${g.local ? 'Delete local files' : 'Download'}">${g.local ? '🗑 Delete' : '⬇ Install'}</button></div></div></div>` }
+
+    function listRow(g) { return `<div class="ll-row"><div class="ll-thumb">${g.emoji}</div><div class="ll-info"><div class="ll-title">${g.title}</div><div class="ll-dev">by ${g.dev}</div><div class="ll-meta"><span class="ll-tag">${g.genre}</span><span class="ll-hours">${g.hours}h played</span><span style="font-size:11px;color:var(--muted)">Last: ${g.lastPlayed}</span></div></div><div class="ll-right"><span class="cloud-badge"><div class="cloud-dot ${g.local ? 'local' : 'cloud'}"></div><span style="font-size:11px;color:var(--muted2)">${g.local ? 'Downloaded' : 'Cloud'}</span></span><div class="ll-actions"><button class="btn btn-primary btn-sm" onclick="play('${g.title}')">▶ Play</button><button class="btn btn-ghost btn-sm" onclick="toggleLocal(${g.id})">${g.local ? '🗑' : '⬇'}</button></div></div></div>` }
+
+    function render(list) {
+      const c = document.getElementById('lib-container');
+      if (viewMode === 'grid') { c.className = 'lib-grid'; c.innerHTML = list.map(gridCard).join('') }
+      else { c.className = 'lib-list'; c.innerHTML = list.map(listRow).join('') }
+    }
+    function getFiltered() {
+      if (cur === 'local') return GAMES.filter(g => g.local);
+      if (cur === 'cloud') return GAMES.filter(g => !g.local);
+      if (cur === 'recent') return GAMES.filter(g => g.lastPlayed === 'Today' || g.lastPlayed === 'Yesterday');
+      return GAMES;
+    }
+    function setFilter(f, el) { cur = f; document.querySelectorAll('.fpill').forEach(p => p.classList.remove('on')); el.classList.add('on'); render(getFiltered()) }
+    function setView(v) { viewMode = v; document.getElementById('vg').classList.toggle('on', v === 'grid'); document.getElementById('vl').classList.toggle('on', v === 'list'); render(getFiltered()) }
+    function doSearch(q) { const l = q ? GAMES.filter(g => g.title.toLowerCase().includes(q.toLowerCase()) || g.genre.includes(q.toLowerCase())) : getFiltered(); render(l) }
+    function play(title) { toast(`Launching ${title}… 🚀`, 's') }
+    function toggleLocal(id) { const g = GAMES.find(x => x.id === id); g.local = !g.local; toast(g.local ? `${g.title} downloaded 💾` : `Local files deleted — cloud save preserved ☁️`, g.local ? 's' : 'i'); render(getFiltered()) }
+    function toast(msg, t) { const c = document.getElementById('toasts'); const el = document.createElement('div'); el.className = `tst ${t}`; el.innerHTML = `<span>${t === 's' ? '✅' : 'ℹ️'}</span>${msg}`; c.appendChild(el); setTimeout(() => el.remove(), 3000) }
+    render(GAMES);
+  </script>
+</body>
+
+</html>
