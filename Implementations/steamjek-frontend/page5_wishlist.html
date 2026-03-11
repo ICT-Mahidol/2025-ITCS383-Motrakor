@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SteamJek — Wishlist</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090f;
+      --bg2: #0c0f1a;
+      --panel: #131b2e;
+      --panel2: #1a2540;
+      --border: #1e2d4a;
+      --border2: #253656;
+      --accent: #00d4ff;
+      --accent2: #7c3aed;
+      --gold: #f59e0b;
+      --red: #ef4444;
+      --green: #10b981;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --muted2: #94a3b8;
+      --fw: 'Rajdhani', sans-serif;
+      --fb: 'Exo 2', sans-serif;
+      --fm: 'JetBrains Mono', monospace
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fb);
+      min-height: 100vh
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg2)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 3px
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh
+    }
+
+    .sidebar {
+      width: 230px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100
+    }
+
+    .main {
+      margin-left: 230px;
+      flex: 1
+    }
+
+    .logo {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+      flex-shrink: 0
+    }
+
+    .logo-text {
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 1px
+    }
+
+    .logo-text em {
+      color: var(--accent);
+      font-style: normal
+    }
+
+    .nav-section {
+      padding: 16px 20px 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      color: var(--muted);
+      text-transform: uppercase
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 20px;
+      color: var(--muted2);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all .2s;
+      text-decoration: none
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, .03)
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(0, 212, 255, .06)
+    }
+
+    .nav-icon {
+      font-size: 16px;
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--accent2);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-family: var(--fm)
+    }
+
+    .sidebar-foot {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: auto
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--panel);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .2s;
+      border: 1px solid var(--border);
+      text-decoration: none
+    }
+
+    .user-pill:hover {
+      background: var(--panel2)
+    }
+
+    .u-av {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0
+    }
+
+    .u-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .u-bal {
+      font-size: 11px;
+      color: var(--gold);
+      font-family: var(--fm)
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 62px;
+      background: rgba(7, 9, 15, .92);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 28px
+    }
+
+    .tb-title {
+      font-family: var(--fw);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: .5px
+    }
+
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--fb);
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+      text-decoration: none;
+      letter-spacing: .2px
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000
+    }
+
+    .btn-primary:hover {
+      background: #22e0ff;
+      box-shadow: 0 0 22px rgba(0, 212, 255, .35)
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted2);
+      border: 1px solid var(--border)
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--muted);
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .btn-red {
+      background: rgba(239, 68, 68, .12);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, .2)
+    }
+
+    .btn-red:hover {
+      background: rgba(239, 68, 68, .22)
+    }
+
+    .btn-sm {
+      padding: 6px 13px;
+      font-size: 12px
+    }
+
+    .cart-wrap {
+      position: relative
+    }
+
+    .cart-dot {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--accent);
+      color: #000;
+      font-size: 9px;
+      font-weight: 700;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fm)
+    }
+
+    .content {
+      padding: 28px
+    }
+
+    /* PAGE HEADER */
+    .pg-hdr {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px
+    }
+
+    .pg-title {
+      font-family: var(--fw);
+      font-size: 28px;
+      font-weight: 700
+    }
+
+    .pg-title em {
+      color: var(--red);
+      font-style: normal
+    }
+
+    .pg-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    /* WISH LIST VIEW */
+    .wish-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      transition: all .25s
+    }
+
+    .wish-row:hover {
+      border-color: rgba(239, 68, 68, .3);
+      box-shadow: 0 4px 24px rgba(239, 68, 68, .06)
+    }
+
+    .wish-thumb {
+      width: 100px;
+      height: 80px;
+      background: var(--panel2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--border)
+    }
+
+    .wish-body {
+      flex: 1;
+      padding: 14px 18px;
+      min-width: 0
+    }
+
+    .wish-genre {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px
+    }
+
+    .wish-title {
+      font-family: var(--fw);
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 2px
+    }
+
+    .wish-dev {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px
+    }
+
+    .wish-tags {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .wtag {
+      font-size: 11px;
+      padding: 2px 9px;
+      border-radius: 4px;
+      font-weight: 600
+    }
+
+    .wtag-age-ok {
+      background: rgba(16, 185, 129, .1);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, .2)
+    }
+
+    .wtag-age-18 {
+      background: rgba(239, 68, 68, .1);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, .2)
+    }
+
+    .stars {
+      display: flex;
+      gap: 2px;
+      align-items: center
+    }
+
+    .star {
+      color: var(--gold);
+      font-size: 11px
+    }
+
+    .star.e {
+      color: var(--border)
+    }
+
+    .rv {
+      font-size: 11px;
+      color: var(--muted2);
+      margin-left: 4px;
+      font-family: var(--fm)
+    }
+
+    .wish-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      padding: 14px 18px;
+      flex-shrink: 0;
+      border-left: 1px solid var(--border)
+    }
+
+    .wish-price {
+      font-family: var(--fw);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gold);
+      white-space: nowrap
+    }
+
+    .wish-price.free {
+      color: var(--green)
+    }
+
+    .wish-act-row {
+      display: flex;
+      gap: 8px
+    }
+
+    /* SALE BADGE */
+    .sale-tag {
+      background: var(--gold);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 3px;
+      letter-spacing: .5px
+    }
+
+    /* EMPTY */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px
+    }
+
+    .empty-icon {
+      font-size: 52px;
+      margin-bottom: 14px
+    }
+
+    .empty-title {
+      font-family: var(--fw);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--muted2);
+      margin-bottom: 8px
+    }
+
+    .empty-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px
+    }
+
+    /* SUMMARY BAR */
+    .summary-bar {
+      background: linear-gradient(90deg, rgba(239, 68, 68, .06), rgba(0, 212, 255, .06));
+      border: 1px solid rgba(239, 68, 68, .12);
+      border-radius: 10px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap
+    }
+
+    .sb-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center
+    }
+
+    .sb-val {
+      font-family: var(--fw);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--red)
+    }
+
+    .sb-label {
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    .sb-divider {
+      width: 1px;
+      height: 32px;
+      background: var(--border)
+    }
+
+    /* TOAST */
+    .toasts {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .tst {
+      background: var(--panel2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 280px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
+      animation: slideIn .3s ease
+    }
+
+    .tst.s {
+      border-left: 3px solid var(--green)
+    }
+
+    .tst.i {
+      border-left: 3px solid var(--accent)
+    }
+
+    .tst.r {
+      border-left: 3px solid var(--red)
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .content>* {
+      animation: fadeUp .35s ease both
+    }
+
+    .content>*:nth-child(1) {
+      animation-delay: .05s
+    }
+
+    .content>*:nth-child(2) {
+      animation-delay: .1s
+    }
+
+    .content>*:nth-child(3) {
+      animation-delay: .15s
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="logo">
+        <div class="logo-mark">SJ</div>
+        <div class="logo-text">Steam<em>Jek</em></div>
+      </div>
+      <div class="nav-section">Discover</div>
+      <a class="nav-link" href="page1_store.html"><span class="nav-icon">🏪</span>Store</a>
+      <a class="nav-link active" href="page5_wishlist.html"><span class="nav-icon">❤️</span>Wishlist<span
+          class="nav-badge" id="nb">0</span></a>
+      <div class="nav-section">Library</div>
+      <a class="nav-link" href="page6_library.html"><span class="nav-icon">🎮</span>My Games</a>
+      <div class="nav-section">Market</div>
+      <a class="nav-link" href="page4_marketplace.html"><span class="nav-icon">⚔️</span>Item Market</a>
+      <div class="nav-section">Account</div>
+      <a class="nav-link" href="page7_profile.html"><span class="nav-icon">👤</span>Profile</a>
+      <a class="nav-link" href="page3_cart.html"><span class="nav-icon">🛒</span>Cart<span
+          class="nav-badge">2</span></a>
+      <div class="sidebar-foot" id="user-context"></div>
+    </nav>
+    <div class="main">
+      <div class="topbar">
+        <div class="tb-title">❤️ Wishlist</div>
+        <div class="tb-right">
+          <button class="btn btn-ghost btn-sm" onclick="addAll()">🛒 Add All to Cart</button>
+          <div class="cart-wrap"><a href="page3_cart.html" class="btn btn-primary btn-sm">🛒 <span class="cart-dot"
+                style="position:static;display:inline-flex;margin-left:2px">2</span></a></div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="pg-hdr">
+          <div>
+            <div class="pg-title">My <em>Wishlist</em></div>
+            <div class="pg-sub" id="pg-sub">Loading wishlist...</div>
+          </div>
+          <a href="page1_store.html" class="btn btn-ghost btn-sm">Browse Store →</a>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="summary-bar">
+          <div class="sb-stat">
+            <div class="sb-val" id="sb-count">0</div>
+            <div class="sb-label">Games</div>
+          </div>
+          <div class="sb-divider"></div>
+          <div class="sb-stat">
+            <div class="sb-val" id="sb-total" style="color:var(--gold)">$0.00</div>
+            <div class="sb-label">Total Value</div>
+          </div>
+          <div class="sb-divider"></div>
+          <div class="sb-stat">
+            <div class="sb-val" style="color:var(--green)">1</div>
+            <div class="sb-label">On Sale</div>
+          </div>
+        </div>
+
+        <div id="wish-list"></div>
+      </div>
+    </div>
+  </div>
+  <div class="toasts" id="toasts"></div>
+
+  <script src="api.js"></script>
+  <script>
+    let wishlist = [];
+
+    function stars(r) { return [1, 2, 3, 4, 5].map(i => `<span class="star${i > r ? ' e' : ''}">★</span>`).join('') }
+    
+    function row(g) {
+      const emoji = g.cover_image || "🎮";
+      const rating = 4.5;
+      const dev = "Developer";
+      const priceFmt = Number(g.price) === 0 ? 'FREE' : '$' + Number(g.price).toFixed(2);
+      
+      return `
+<div class="wish-row" id="wr-${g.game_id}">
+  <div class="wish-thumb">${emoji}</div>
+  <div class="wish-body">
+    <div class="wish-genre">${g.genre || 'UNSPECIFIED'}</div>
+    <div class="wish-title">${g.title}</div>
+    <div class="wish-dev">by ${dev}</div>
+    <div class="wish-tags">
+      <span class="wtag wtag-age-ok">All Ages</span>
+      <div class="stars">${stars(Math.round(rating))}<span class="rv">${rating}</span></div>
+    </div>
+  </div>
+  <div class="wish-actions">
+    <div class="wish-price ${Number(g.price) === 0 ? 'free' : ''}">${priceFmt}</div>
+    <div class="wish-act-row">
+      <button class="btn btn-primary btn-sm" onclick="addCart(${g.game_id})">🛒 Add to Cart</button>
+      <button class="btn btn-red btn-sm" onclick="removeWish(${g.game_id})" title="Remove from wishlist">✕</button>
+    </div>
+  </div>
+</div>`
+    }
+
+    function render() {
+      const list = document.getElementById('wish-list');
+      if (!wishlist || wishlist.length === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-title">Your wishlist is empty</div><div class="empty-sub">Browse the store and save games you want to play later</div><a href="page1_store.html" class="btn btn-primary">Browse Store →</a></div>`;
+        document.getElementById('pg-sub').textContent = `Your wishlist is currently empty`;
+        document.getElementById('sb-count').textContent = '0';
+        document.getElementById('sb-total').textContent = '$0.00';
+        if (document.getElementById('nb')) document.getElementById('nb').textContent = '0';
+        return;
+      }
+
+      list.innerHTML = wishlist.map(row).join('');
+      
+      const total = wishlist.reduce((s, g) => s + Number(g.price || 0), 0);
+      document.getElementById('pg-sub').textContent = `${wishlist.length} game${wishlist.length !== 1 ? 's' : ''} saved for later`;
+      document.getElementById('sb-count').textContent = wishlist.length;
+      document.getElementById('sb-total').textContent = '$' + total.toFixed(2);
+      if (document.getElementById('nb')) document.getElementById('nb').textContent = wishlist.length;
+    }
+
+    async function initPage() {
+      if (!Auth.isAuthenticated()) {
+        const list = document.getElementById('wish-list');
+        list.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><div class="empty-title">Login Required</div><div class="empty-sub">Please log in to view your wishlist</div><a href="page1_store.html" class="btn btn-primary">Go to Login →</a></div>`;
+        return;
+      }
+      try {
+        const data = await apiFetch('/wishlist');
+        wishlist = data;
+        render();
+      } catch (err) {
+        showToast(err.message || 'Failed to load wishlist', 'e');
+      }
+    }
+
+    async function addCart(id) {
+      if (!Auth.isAuthenticated()) { showToast('Please login', 'e'); return; }
+      try {
+        await apiFetch('/cart', {
+          method: 'POST',
+          body: JSON.stringify({ game_id: id })
+        });
+        showToast('Added to cart 🛒', 's');
+      } catch (err) {
+        showToast(err.message, 'e');
+      }
+    }
+
+    async function removeWish(id) {
+      if (!Auth.isAuthenticated()) return;
+      try {
+        await apiFetch(`/wishlist/${id}`, { method: 'DELETE' });
+        showToast('Removed from wishlist', 'r');
+        await initPage(); // reload
+      } catch (err) {
+        showToast(err.message, 'e');
+      }
+    }
+
+    async function addAll() {
+      if (!wishlist.length) { showToast('Wishlist is empty', 'i'); return }
+      try {
+        for (const item of wishlist) {
+          await apiFetch('/cart', {
+            method: 'POST',
+            body: JSON.stringify({ game_id: item.game_id })
+          }).catch(e => {
+            if(e.message && e.message.includes('already')) return;
+            throw e;
+          });
+        }
+        showToast(`Added ${wishlist.length} games to cart 🛒`, 's');
+      } catch(err) {
+        showToast(err.message, 'e');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+
+</html>

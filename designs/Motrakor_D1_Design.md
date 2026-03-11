@@ -9,7 +9,6 @@ System Architecture:
 &nbsp;&nbsp; --Cloud Database [Neon]<br>
 &nbsp;&nbsp; --Payment Gateway [Stripe]<br>
 &nbsp;&nbsp; --Cloud Object Storage [Amazon S3]<br>
-&nbsp;&nbsp; --Content Delivery Network [AWS Cloudfront]<br>
 
 Focusing a role-based access control (RBAC) in the system.
 

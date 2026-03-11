@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SteamJek — NebulaSiege</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090f;
+      --bg2: #0c0f1a;
+      --bg3: #111827;
+      --panel: #131b2e;
+      --panel2: #1a2540;
+      --border: #1e2d4a;
+      --border2: #253656;
+      --accent: #00d4ff;
+      --accent2: #7c3aed;
+      --gold: #f59e0b;
+      --red: #ef4444;
+      --green: #10b981;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --muted2: #94a3b8;
+      --fw: 'Rajdhani', sans-serif;
+      --fb: 'Exo 2', sans-serif;
+      --fm: 'JetBrains Mono', monospace
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fb);
+      min-height: 100vh
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg2)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 3px
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh
+    }
+
+    .sidebar {
+      width: 230px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100
+    }
+
+    .main {
+      margin-left: 230px;
+      flex: 1
+    }
+
+    .logo {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(0, 212, 255, .25)
+    }
+
+    .logo-text {
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 1px
+    }
+
+    .logo-text em {
+      color: var(--accent);
+      font-style: normal
+    }
+
+    .nav-section {
+      padding: 16px 20px 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      color: var(--muted);
+      text-transform: uppercase
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 20px;
+      color: var(--muted2);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all .2s;
+      text-decoration: none
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, .03)
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(0, 212, 255, .06)
+    }
+
+    .nav-icon {
+      font-size: 16px;
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--accent2);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-family: var(--fm)
+    }
+
+    .sidebar-foot {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: auto
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--panel);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .2s;
+      border: 1px solid var(--border);
+      text-decoration: none
+    }
+
+    .user-pill:hover {
+      background: var(--panel2)
+    }
+
+    .u-av {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fw);
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0
+    }
+
+    .u-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text)
+    }
+
+    .u-bal {
+      font-size: 11px;
+      color: var(--gold);
+      font-family: var(--fm)
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 62px;
+      background: rgba(7, 9, 15, .92);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 28px
+    }
+
+    .tb-title {
+      font-family: var(--fw);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      flex-shrink: 0
+    }
+
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto
+    }
+
+    #cart-wrap {
+      position: relative;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--fb);
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+      text-decoration: none;
+      letter-spacing: .2px
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000
+    }
+
+    .btn-primary:hover {
+      background: #22e0ff;
+      box-shadow: 0 0 22px rgba(0, 212, 255, .35)
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted2);
+      border: 1px solid var(--border)
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--muted);
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .btn-purple {
+      background: var(--accent2);
+      color: #fff
+    }
+
+    .btn-purple:hover {
+      background: #6d28d9;
+      box-shadow: 0 0 22px rgba(124, 58, 237, .35)
+    }
+
+    .btn-sm {
+      padding: 6px 13px;
+      font-size: 12px
+    }
+
+    .cart-wrap {
+      position: relative
+    }
+
+    .cart-dot {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--accent);
+      color: #000;
+      font-size: 9px;
+      font-weight: 700;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fm)
+    }
+
+    .content {
+      padding: 28px
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted2);
+      font-size: 13px;
+      cursor: pointer;
+      margin-bottom: 22px;
+      text-decoration: none;
+      transition: color .2s
+    }
+
+    .back:hover {
+      color: var(--text)
+    }
+
+    /* HERO */
+    .detail-hero {
+      height: 300px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 30px;
+      position: relative;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #08142a, #150828, #081a14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 90px
+    }
+
+    .detail-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(7, 9, 15, .92) 0%, rgba(7, 9, 15, .3) 60%, transparent 100%)
+    }
+
+    .detail-hero-fx {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 50% 70% at 70% 50%, rgba(0, 212, 255, .12) 0%, transparent 60%)
+    }
+
+    .detail-hero-grid {
+      position: absolute;
+      inset: 0;
+      opacity: .08;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px
+    }
+
+    .detail-hero-content {
+      position: absolute;
+      left: 52px;
+      top: 50%;
+      transform: translateY(-50%)
+    }
+
+    .detail-hero-tag {
+      display: inline-block;
+      background: rgba(0, 212, 255, .12);
+      border: 1px solid rgba(0, 212, 255, .28);
+      color: var(--accent);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-bottom: 10px
+    }
+
+    .detail-hero-title {
+      font-family: var(--fw);
+      font-size: 44px;
+      font-weight: 700;
+      line-height: 1.0;
+      margin-bottom: 6px;
+      text-shadow: 0 0 40px rgba(0, 212, 255, .2)
+    }
+
+    .detail-hero-dev {
+      font-size: 14px;
+      color: var(--muted2)
+    }
+
+    /* LAYOUT */
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 28px;
+      align-items: start
+    }
+
+    .d-left {}
+
+    .d-right {}
+
+    /* META */
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    .tag-genre {
+      background: rgba(0, 212, 255, .1);
+      border: 1px solid rgba(0, 212, 255, .22);
+      color: var(--accent)
+    }
+
+    .tag-age-ok {
+      background: rgba(16, 185, 129, .1);
+      border: 1px solid rgba(16, 185, 129, .22);
+      color: var(--green)
+    }
+
+    .tag-age-18 {
+      background: rgba(239, 68, 68, .1);
+      border: 1px solid rgba(239, 68, 68, .22);
+      color: var(--red)
+    }
+
+    .stars {
+      display: flex;
+      gap: 2px;
+      align-items: center
+    }
+
+    .star {
+      color: var(--gold);
+      font-size: 13px
+    }
+
+    .star.e {
+      color: var(--border)
+    }
+
+    .rv {
+      font-size: 12px;
+      color: var(--muted2);
+      margin-left: 5px;
+      font-family: var(--fm)
+    }
+
+    /* DESC */
+    .section-title {
+      font-family: var(--fw);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .desc-text {
+      font-size: 14px;
+      color: var(--muted2);
+      line-height: 1.85;
+      margin-bottom: 28px;
+      font-weight: 300
+    }
+
+    /* SPECS */
+    .spec-table {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 28px
+    }
+
+    .spec-row {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .spec-row:last-child {
+      border-bottom: none
+    }
+
+    .spec-k {
+      padding: 11px 16px;
+      background: var(--panel);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted2)
+    }
+
+    .spec-v {
+      padding: 11px 16px;
+      background: var(--bg2);
+      font-size: 13px;
+      font-family: var(--fm);
+      color: var(--text)
+    }
+
+    /* SCREENSHOTS (simulated) */
+    .screenshots {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 28px;
+      overflow-x: auto
+    }
+
+    .screenshot {
+      flex-shrink: 0;
+      width: 200px;
+      height: 110px;
+      border-radius: 8px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .screenshot:hover {
+      border-color: rgba(0, 212, 255, .3);
+      transform: scale(1.02)
+    }
+
+    /* REVIEWS */
+    .review-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px
+    }
+
+    .rev-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px
+    }
+
+    .rev-av {
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0
+    }
+
+    .rev-name {
+      font-size: 13px;
+      font-weight: 600
+    }
+
+    .rev-date {
+      font-size: 11px;
+      color: var(--muted);
+      margin-left: auto;
+      font-family: var(--fm)
+    }
+
+    .rev-text {
+      font-size: 13px;
+      color: var(--muted2);
+      line-height: 1.7;
+      font-weight: 300
+    }
+
+    /* BUY CARD */
+    .buy-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px;
+      position: sticky;
+      top: 80px
+    }
+
+    .buy-price {
+      font-family: var(--fw);
+      font-size: 46px;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1
+    }
+
+    .buy-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      margin-bottom: 22px
+    }
+
+    .buy-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 22px
+    }
+
+    .buy-btns .btn {
+      justify-content: center;
+      padding: 13px;
+      font-size: 14px;
+      width: 100%
+    }
+
+    .buy-feats {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .buy-feat {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      color: var(--muted2)
+    }
+
+    .bf-ok {
+      color: var(--green);
+      font-size: 12px
+    }
+
+    /* TOAST */
+    .toasts {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .tst {
+      background: var(--panel2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 280px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
+      animation: tIn .3s ease
+    }
+
+    .tst.s {
+      border-left: 3px solid var(--green)
+    }
+
+    .tst.i {
+      border-left: 3px solid var(--accent)
+    }
+
+    @keyframes tIn {
+      from {
+        opacity: 0;
+        transform: translateX(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .detail-hero {
+      animation: fadeUp .4s ease both
+    }
+
+    .detail-layout {
+      animation: fadeUp .4s ease .12s both
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="logo">
+        <div class="logo-mark">SJ</div>
+        <div class="logo-text">Steam<em>Jek</em></div>
+      </div>
+      <div class="nav-section">Discover</div>
+      <a class="nav-link active" href="page1_store.html"><span class="nav-icon">🏪</span>Store</a>
+      <a class="nav-link" href="page5_wishlist.html"><span class="nav-icon">❤️</span>Wishlist<span
+          class="nav-badge">3</span></a>
+      <div class="nav-section">Library</div>
+      <a class="nav-link" href="page6_library.html"><span class="nav-icon">🎮</span>My Games</a>
+      <div class="nav-section">Market</div>
+      <a class="nav-link" href="page4_marketplace.html"><span class="nav-icon">⚔️</span>Item Market</a>
+      <div class="nav-section">Account</div>
+      <a class="nav-link" href="page7_profile.html"><span class="nav-icon">👤</span>Profile</a>
+      <a class="nav-link" href="page3_cart.html"><span class="nav-icon">🛒</span>Cart<span
+          class="nav-badge">2</span></a>
+      <div class="sidebar-foot" id="user-context"></div>
+    </nav>
+    <div class="main">
+      <div class="topbar">
+        <div class="tb-title">Game Details</div>
+        <div class="tb-right" id="topbar-right">
+          <!-- Dynamically injected topbar buttons -->
+        </div>
+      </div>
+      <div class="content" id="main-content" style="display:none;">
+        <a class="back" href="page1_store.html">← Back to Store</a>
+
+        <!-- HERO -->
+        <div class="detail-hero">
+          <span id="game-emoji" style="z-index: 1;">🌌</span>
+          <div class="detail-hero-overlay"></div>
+          <div class="detail-hero-fx"></div>
+          <div class="detail-hero-grid"></div>
+          <div class="detail-hero-content">
+            <div class="detail-hero-tag" id="game-tag">Strategy · StarForge Studios</div>
+            <div class="detail-hero-title" id="game-title">NebulaSiege</div>
+            <div class="detail-hero-dev" id="game-dev">by StarForge Studios · 2025</div>
+          </div>
+        </div>
+
+        <div class="detail-layout">
+          <!-- LEFT -->
+          <div class="d-left">
+            <div class="meta-row" id="meta-row">
+              <span class="tag tag-genre" id="meta-genre">STRATEGY</span>
+              <!-- Rating injected dynamically -->
+            </div>
+
+            <div class="section-title">About This Game</div>
+            <div class="desc-text" id="game-desc">
+              <!-- Description goes here -->
+            </div>
+
+            <!-- Omitting Screenshots and System Requirements to keep code concise, retaining structure -->
+            <div class="section-title">Screenshots</div>
+            <div class="screenshots">
+              <div class="screenshot">🌌</div>
+              <div class="screenshot">🚀</div>
+              <div class="screenshot">⚔️</div>
+              <div class="screenshot">🌍</div>
+              <div class="screenshot">💫</div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT - BUY CARD -->
+          <div class="d-right">
+            <div class="buy-card">
+              <div class="buy-price" id="game-price">$34.99</div>
+              <div class="buy-sub">One-time purchase · DRM-free cloud access</div>
+              <div class="buy-btns" id="buy-actions">
+                <button class="btn btn-ghost" id="cart-btn" onclick="toggleCart()">+ Add to Cart</button>
+                <button class="btn btn-ghost" id="wish-btn" onclick="toggleWish()">❤️ Add to Wishlist</button>
+              </div>
+              <div class="buy-feats">
+                <div class="buy-feat"><span class="bf-ok">✓</span> Cloud saves — play from any machine</div>
+                <div class="buy-feat"><span class="bf-ok">✓</span> Windows 10/11 · Instant download</div>
+                <div class="buy-feat"><span class="bf-ok">✓</span> Encrypted payment · Secured data</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toasts" id="toasts"></div>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="auth-overlay">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 class="modal-title" id="auth-title">Welcome to SteamJek</h3>
+        <button class="close-btn" onclick="closeAuthModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="auth-tabs">
+          <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</div>
+          <div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Register</div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" onsubmit="handleAuth(event, 'login')">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="login-email" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="login-password" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Login</button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" style="display: none;" onsubmit="handleAuth(event, 'register')">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-input" id="reg-username" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="reg-email" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="reg-password" required>
+          </div>
+          <button type="submit" class="btn btn-purple" style="width: 100%; justify-content: center; margin-top: 10px;">Create Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <style>
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+      width: 100%; max-width: 400px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .modal-head {
+      padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title { font-family: var(--fw); font-size: 20px; font-weight: 700; color: #fff; }
+    .close-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; transition: color 0.2s; }
+    .close-btn:hover { color: #fff; }
+    .modal-body { padding: 24px; }
+    .auth-tabs { display: flex; gap: 4px; background: var(--bg2); padding: 4px; border-radius: 8px; margin-bottom: 24px; }
+    .auth-tab { flex: 1; padding: 8px 0; text-align: center; font-size: 14px; font-weight: 600; color: var(--muted2); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+    .auth-tab.active { background: var(--panel2); color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--muted2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-input {
+      width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;
+      color: #fff; font-family: var(--fb); font-size: 14px; transition: border-color 0.2s;
+    }
+    .form-input:focus { outline: none; border-color: var(--accent); }
+  </style>
+
+  <script>
+    let globalGameDetails = null;
+
+    // --- AUTH FLOW ---
+    function showAuthModal() { document.getElementById('auth-overlay').style.display = 'flex'; }
+    function closeAuthModal() { document.getElementById('auth-overlay').style.display = 'none'; }
+    
+    function switchAuthTab(tab) {
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+      document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+      document.getElementById('auth-title').innerText = tab === 'login' ? 'Welcome Back' : 'Create Account';
+    }
+
+    async function handleAuth(e, type) {
+      e.preventDefault();
+      try {
+        if (type === 'login') {
+          const email = document.getElementById('login-email').value;
+          const password = document.getElementById('login-password').value;
+          await Auth.login(email, password);
+        } else {
+          const username = document.getElementById('reg-username').value;
+          const email = document.getElementById('reg-email').value;
+          const password = document.getElementById('reg-password').value;
+          const res = await apiFetch('/auth/register', { method: 'POST', body: JSON.stringify({ username, email, password }) });
+          showToast('Registration successful! Please login.', 's');
+          switchAuthTab('login');
+          return; // Stop here, need to login now
+        }
+        closeAuthModal();
+        initPage(); // Refresh UI
+      } catch (err) {
+        // Errors handled by api.js
+      }
+    }
+
+    function doLogout() {
+      Auth.logout();
+      showToast('Logged out successfully', 'i');
+      initPage();
+    }
+
+    // --- UI UPDATES ---
+    function updateTopBar() {
+      const tbRight = document.getElementById('topbar-right');
+      const isAuth = Auth.isAuthenticated();
+      const userStr = localStorage.getItem('steamjek_user');
+      let user = null;
+      try { user = userStr ? JSON.parse(userStr) : null; } catch(e){}
+
+      tbRight.innerHTML = ''; // Clear
+
+      if (isAuth && user) {
+        // Cart wrap
+        const cartWrap = document.createElement('div');
+        cartWrap.id = 'cart-wrap';
+        cartWrap.innerHTML = `<a href="page3_cart.html" class="btn btn-ghost btn-sm">🛒<span class="cart-dot" id="cart-count">0</span></a>`;
+        tbRight.appendChild(cartWrap);
+
+        // Profile Btn
+        const profBtn = document.createElement('a');
+        profBtn.href = 'page7_profile.html';
+        profBtn.className = 'btn btn-primary btn-sm';
+        profBtn.innerHTML = `👤 Profile`;
+        tbRight.appendChild(profBtn);
+
+        // Logout Btn
+        const logBtn = document.createElement('button');
+        logBtn.className = 'btn btn-ghost btn-sm';
+        logBtn.innerHTML = `Logout`;
+        logBtn.onclick = doLogout;
+        tbRight.appendChild(logBtn);
+        updateSidebarUser();
+      } else {
+        const authBtn = document.createElement('button');
+        authBtn.innerHTML = `👤 Login / Register`;
+        authBtn.className = 'btn btn-primary btn-sm';
+        authBtn.onclick = showAuthModal;
+        tbRight.appendChild(authBtn);
+        updateSidebarUser();
+      }
+    }
+
+    function renderStars(r) { return [1, 2, 3, 4, 5].map(i => `<span class="star${i > r ? ' e' : ''}">★</span>`).join('') }
+
+    async function initPage() {
+      updateTopBar();
+      const urlParams = new URLSearchParams(window.location.search);
+      const gameId = urlParams.get('id');
+
+      if (!gameId) {
+        document.getElementById('main-content').innerHTML = '<div style="padding: 40px; text-align: center; color: var(--red);">Error: No game ID provided in URL. <a href="page1_store.html" style="color:var(--accent)">Go to Store</a></div>';
+        document.getElementById('main-content').style.display = 'block';
+        return;
+      }
+
+      try {
+        const game = await apiFetch(`/games/${gameId}`);
+        globalGameDetails = game;
+        
+        // Update DOM
+        document.getElementById('game-title').innerText = game.title;
+        document.getElementById('game-emoji').innerText = game.emoji || '🎮';
+        
+        const devName = game.creator_id ? `Creator ID ${game.creator_id}` : (game.dev || 'Developer');
+        document.getElementById('game-dev').innerText = `by ${devName} · 2025`;
+        document.getElementById('game-tag').innerText = `${game.genre || 'UNSPECIFIED'} · ${devName}`;
+        
+        document.getElementById('meta-genre').innerText = (game.genre || 'UNSPECIFIED').toUpperCase();
+        
+        // Fetch ratings
+        let avgRating = 0;
+        let totalReviews = 0;
+        try {
+            const ratingData = await apiFetch(`/ratings/${gameId}`);
+            if (ratingData) {
+                avgRating = Number(ratingData.average_rating) || 0;
+                totalReviews = ratingData.total_reviews || 0;
+            }
+        } catch (e) {
+            console.warn("Could not fetch ratings", e);
+        }
+        
+        const metaRow = document.getElementById('meta-row');
+        // Clear all but genre tag
+        const genreTag = metaRow.firstElementChild;
+        metaRow.innerHTML = '';
+        metaRow.appendChild(genreTag);
+        
+        // Add age tag (fake data for now)
+        metaRow.innerHTML += `<span class="tag tag-age-ok">All Ages</span>`;
+        // Add stars
+        metaRow.innerHTML += `<div class="stars">${renderStars(Math.round(avgRating))}<span class="rv">${avgRating.toFixed(1)} (${totalReviews} Reviews)</span></div>`;
+
+        document.getElementById('game-desc').innerText = game.description || 'No description available for this game.';
+        
+        const price = Number(game.price);
+        document.getElementById('game-price').innerText = price === 0 ? 'FREE' : '$' + price.toFixed(2);
+        
+        // Setup initial cart/wish btn state if logged in
+        if (Auth.isAuthenticated()) {
+            const cartItems = await apiFetch('/cart');
+            if (cartItems) {
+                inCart = cartItems.some(item => Number(item.game_id) === Number(gameId));
+            }
+            const wishItems = await apiFetch('/wishlist');
+            if (wishItems) {
+                inWish = wishItems.some(item => Number(item.game_id) === Number(gameId));
+            }
+            const purchases = await apiFetch('/purchases');
+            if (purchases) {
+                inLibrary = purchases.some(item => Number(item.game_id) === Number(gameId));
+            }
+        }
+        
+        updateCartBtnUI();
+        updateWishBtnUI();
+        
+        // Render rating section if owned
+        const existingRating = document.getElementById('rating-section-wrap');
+        if (existingRating) existingRating.remove();
+        if (inLibrary) {
+            renderRatingSection(gameId);
+        }
+        
+        document.getElementById('main-content').style.display = 'block';
+
+      } catch (e) {
+        console.error("Error loading game:", e);
+        document.getElementById('main-content').innerHTML = '<div style="padding: 40px; text-align: center; color: var(--red);">Error loading game details. It may not exist. <a href="page1_store.html" style="color:var(--accent)">Go to Store</a></div>';
+        document.getElementById('main-content').style.display = 'block';
+      }
+    }
+    
+    function updateCartBtnUI() {
+      const b = document.getElementById('cart-btn');
+      if (b) {
+        if (inLibrary) {
+            b.textContent = '✓ In Library';
+            b.className = 'btn btn-ghost added';
+            b.style.pointerEvents = 'none';
+        } else {
+            b.textContent = inCart ? '✓ In Cart' : '+ Add to Cart';
+            b.className = inCart ? 'btn btn-ghost' : 'btn btn-primary';
+            b.style.pointerEvents = 'auto';
+        }
+      }
+      
+      const dot = document.getElementById('cart-count');
+      if (dot) {
+        const cartStr = localStorage.getItem('steamjek_cart');
+        const cartArr = cartStr ? JSON.parse(cartStr) : [];
+        dot.innerText = cartArr.length;
+      }
+    }
+
+    function updateWishBtnUI() {
+      const b = document.getElementById('wish-btn'); 
+      if (b) {
+        b.textContent = inWish ? '❤️ Wishlisted' : '❤️ Add to Wishlist'; 
+        b.className = inWish ? 'btn btn-purple' : 'btn btn-ghost'; 
+      }
+    }
+
+    let inCart = false, inWish = false, inLibrary = false, rated = 0;
+    
+    async function toggleCart() { 
+      if (!Auth.isAuthenticated()) {
+        showToast('Please login to add to cart', 'i');
+        showAuthModal();
+        return;
+      }
+      
+      if (inLibrary) {
+        showToast('You already own this game', 'i');
+        return;
+      }
+      
+      if (!globalGameDetails) return;
+      
+      const gameId = Number(globalGameDetails.id);
+      try {
+          if (inCart) {
+              const res = await apiFetch(`/cart/${gameId}`, { method: 'DELETE' });
+              if (res) {
+                  inCart = false;
+                  showToast('Removed from cart', 'i');
+              }
+          } else {
+              const res = await apiFetch('/cart', {
+                  method: 'POST',
+                  body: JSON.stringify({ game_id: gameId })
+              });
+              if (res) {
+                  inCart = true;
+                  showToast(`${globalGameDetails.title} added to cart 🛒`, 's');
+              }
+          }
+          updateCartBtnUI();
+      } catch (err) {
+          console.error("Cart toggle failed:", err);
+      }
+    }
+    
+    function renderRatingSection(gameId) {
+        const wrap = document.createElement('div');
+        wrap.id = 'rating-section-wrap';
+        wrap.className = 'rating-section';
+        wrap.style.marginTop = '30px';
+        wrap.style.padding = '20px';
+        wrap.style.background = 'var(--panel2)';
+        wrap.style.borderRadius = '12px';
+        wrap.innerHTML = `
+            <h3 style="margin-bottom:15px; color:#fff;">Rate this Game</h3>
+            <div id="interactive-stars" style="font-size:24px; cursor:pointer; margin-bottom:15px;">
+                <span data-val="1" style="color:#444;">★</span><span data-val="2" style="color:#444;">★</span><span data-val="3" style="color:#444;">★</span><span data-val="4" style="color:#444;">★</span><span data-val="5" style="color:#444;">★</span>
+            </div>
+            <textarea id="rating-review" placeholder="Write a review (optional)..." style="width:100%; height:80px; background:var(--bg2); border:1px solid var(--border); color:#fff; border-radius:8px; padding:10px; margin-bottom:15px; font-family:inherit;"></textarea>
+            <button class="btn btn-primary" id="submit-rating-btn">Submit Rating</button>
+        `;
+        document.getElementById('game-desc').parentNode.appendChild(wrap);
+
+        let selectedRating = 0;
+        const stars = wrap.querySelectorAll('#interactive-stars span');
+        
+        function updateInteractiveStars(val) {
+            stars.forEach(s => {
+                s.style.color = Number(s.dataset.val) <= val ? '#fc0' : '#444';
+            });
+        }
+        
+        stars.forEach(s => {
+            s.onmouseover = () => updateInteractiveStars(Number(s.dataset.val));
+            s.onmouseout = () => updateInteractiveStars(selectedRating);
+            s.onclick = () => { selectedRating = Number(s.dataset.val); updateInteractiveStars(selectedRating); };
+        });
+
+        document.getElementById('submit-rating-btn').onclick = async () => {
+            if (selectedRating === 0) return showToast('Please select a star rating', 'e');
+            const review = document.getElementById('rating-review').value;
+            try {
+                const res = await apiFetch(`/ratings/${gameId}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ rating: selectedRating, review })
+                });
+                if (res) {
+                    showToast(res.message || 'Rating submitted!', 's');
+                    initPage(); // Refresh to show new average
+                }
+            } catch (err) {
+                console.error("Failed to rate", err);
+            }
+        };
+    }
+    
+    async function toggleWish() { 
+      if (!Auth.isAuthenticated()) {
+        showToast('Please login to wishlist games', 'i');
+        showAuthModal();
+        return;
+      }
+      
+      if (!globalGameDetails) return;
+      const gameId = Number(globalGameDetails.id);
+
+      try {
+          if (inWish) {
+              const res = await apiFetch(`/wishlist/${gameId}`, { method: 'DELETE' });
+              if (res) {
+                  inWish = false;
+                  showToast('Removed from wishlist', 'i');
+              }
+          } else {
+              const res = await apiFetch('/wishlist', {
+                  method: 'POST',
+                  body: JSON.stringify({ game_id: gameId })
+              });
+              if (res) {
+                  inWish = true;
+                  showToast('Added to wishlist ❤️', 's');
+              }
+          }
+          updateWishBtnUI();
+      } catch (err) {
+          console.error("Wishlist toggle failed:", err);
+      }
+    }
+    
+
+    document.addEventListener('DOMContentLoaded', initPage);
+
+  </script>
+</body>
+
+</html>
