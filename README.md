@@ -1,1 +1,2 @@
-# 2025-ITCS383-Motrakor
+# SteamJek Digital Game Distributor
+SteamJek is a cloud-powered digital game distribution platform designed to empower independent and small-scale game developers with a professional marketplace to publish, sell, and manage their titles. Inspired by the model of leading digital storefronts, SteamJek delivers a seamless gaming experience to end users on Windows PCs — enabling them to discover, purchase, download, and play games without the hassle of physical media.
