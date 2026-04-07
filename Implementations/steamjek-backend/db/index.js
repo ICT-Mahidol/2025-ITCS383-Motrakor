@@ -1,9 +1,14 @@
-const { Pool, neonConfig } = require('@neondatabase/serverless');
-const ws = require('ws');
-neonConfig.webSocketConstructor = ws;
-
 const path = require("node:path");
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
+
+let Pool;
+if (process.env.DB_HOST === 'localhost' || process.env.NODE_ENV === 'test') {
+  Pool = require('pg').Pool; // Use standard tcp pg connection for local tests (like GitHub Actions)
+} else {
+  const neon = require('@neondatabase/serverless');
+  Pool = neon.Pool;
+  neon.neonConfig.webSocketConstructor = require('ws'); // Use WebSockets for Neon connection
+}
 
 let poolConfig;
 if (process.env.DATABASE_URL) {

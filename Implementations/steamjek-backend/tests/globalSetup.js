@@ -12,9 +12,14 @@ const path = require('node:path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 module.exports = async () => {
-  const { Pool, neonConfig } = require('@neondatabase/serverless');
-  const ws = require('ws');
-  neonConfig.webSocketConstructor = ws;
+  let Pool;
+  if (process.env.DB_HOST === 'localhost' || process.env.NODE_ENV === 'test') {
+    Pool = require('pg').Pool; // standard postgres via TCP inside GitHub test container
+  } else {
+    const neon = require('@neondatabase/serverless');
+    Pool = neon.Pool;
+    neon.neonConfig.webSocketConstructor = require('ws'); // polyfill Neon websockets
+  }
   
   const bcrypt = require('bcryptjs');
 
