@@ -144,7 +144,7 @@ async function updateBadges() {
     ]);
 
     if (cart) {
-      const cartCounts = document.querySelectorAll('.cart-dot, #cart-count, #cart-badge');
+      const cartCounts = document.querySelectorAll('.cart-dot, #cart-count, #cart-badge, #cart-badge-top');
       cartCounts.forEach(el => el.textContent = cart.length);
       // Also update sidebar cart badge if exists
       const sbCart = document.querySelector('a[href="page3_cart.html"] .nav-badge');
@@ -200,6 +200,30 @@ const Library = {
     window.URL.revokeObjectURL(url);
     return true;
   }
+};
+
+// Point Shop API Functions
+const PointShop = {
+  getPoints:    () => apiFetch('/points'),
+  getRewards:   () => apiFetch('/points/rewards'),
+  getMyRewards: () => apiFetch('/points/my-rewards'),
+  redeemReward: (rewardId) => apiFetch(`/points/redeem/${rewardId}`, { method: 'POST' }),
+  equipReward:  (rewardId) => apiFetch(`/points/equip/${rewardId}`,  { method: 'POST' })
+};
+
+// Community Hub API Functions
+const Community = {
+  getThreads:   (gameId, q, tag) => {
+    const params = new URLSearchParams({ game_id: gameId });
+    if (q)   params.set('q',   q);
+    if (tag && tag !== 'All') params.set('tag', tag);
+    return apiFetch(`/community/threads?${params}`);
+  },
+  getThread:    (threadId) => apiFetch(`/community/threads/${threadId}`),
+  createThread: (payload)  => apiFetch('/community/threads',             { method: 'POST', body: JSON.stringify(payload) }),
+  getReplies:   (threadId) => apiFetch(`/community/threads/${threadId}/replies`),
+  createReply:  (threadId, content) => apiFetch(`/community/threads/${threadId}/replies`, { method: 'POST', body: JSON.stringify({ content }) }),
+  likeThread:   (threadId) => apiFetch(`/community/threads/${threadId}/like`, { method: 'POST' })
 };
 
 // Auto update sidebar and badges on every page that includes this script
