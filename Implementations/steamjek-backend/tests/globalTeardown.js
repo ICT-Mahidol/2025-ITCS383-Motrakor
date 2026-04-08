@@ -3,7 +3,7 @@
  * Closes the shared pg pool so Jest can exit cleanly without open handle warnings.
  */
 
-module.exports = async () => {
+module.exports = async function globalTeardown() {
   try {
     // The pool singleton is cached in the module registry of the worker processes,
     // not the main process, so we just signal that teardown is done.

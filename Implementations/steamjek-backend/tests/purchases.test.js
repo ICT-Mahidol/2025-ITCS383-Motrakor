@@ -79,7 +79,7 @@ describe('Purchases API', () => {
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty('clientSecret');
       expect(res.body).toHaveProperty('amount');
-      expect(parseFloat(res.body.amount)).toBeGreaterThan(0);
+      expect(Number.parseFloat(res.body.amount)).toBeGreaterThan(0);
     });
   });
 

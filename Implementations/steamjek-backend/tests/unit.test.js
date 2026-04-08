@@ -13,6 +13,28 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'test_secret_123';
 
+function makeReqRes(token) {
+  const req = { headers: { authorization: token ? `Bearer ${token}` : undefined } };
+  const res = {
+    statusCode: 200,
+    _json: null,
+    status(code) { this.statusCode = code; return this; },
+    json(data) { this._json = data; return this; }
+  };
+  return { req, res };
+}
+
+function makeAdminReqRes(role) {
+  const req = { user: { role } };
+  const res = {
+    statusCode: 200,
+    _json: null,
+    status(code) { this.statusCode = code; return this; },
+    json(data) { this._json = data; return this; }
+  };
+  return { req, res };
+}
+
 // ── server.js: root route ────────────────────────────────────────────────────
 
 describe('Server Root Route', () => {
@@ -27,17 +49,6 @@ describe('Server Root Route', () => {
 
 describe('Auth Middleware', () => {
   const authenticateToken = require('../middleware/auth');
-
-  function makeReqRes(token) {
-    const req = { headers: { authorization: token ? `Bearer ${token}` : undefined } };
-    const res = {
-      statusCode: 200,
-      _json: null,
-      status(code) { this.statusCode = code; return this; },
-      json(data) { this._json = data; return this; }
-    };
-    return { req, res };
-  }
 
   it('should call next() with valid token', () => {
     const token = jwt.sign({ id: 1, role: 'user' }, JWT_SECRET);
@@ -81,17 +92,6 @@ describe('Auth Middleware', () => {
 
 describe('isAdmin Middleware', () => {
   const isAdmin = require('../middleware/isAdmin');
-
-  function makeAdminReqRes(role) {
-    const req = { user: { role } };
-    const res = {
-      statusCode: 200,
-      _json: null,
-      status(code) { this.statusCode = code; return this; },
-      json(data) { this._json = data; return this; }
-    };
-    return { req, res };
-  }
 
   it('should call next() for admin user', () => {
     const { req, res } = makeAdminReqRes('admin');

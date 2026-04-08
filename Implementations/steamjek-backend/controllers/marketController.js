@@ -183,7 +183,11 @@ const buyItem = async (req, res) => {
     });
   } catch (err) {
     if (client) {
-      try { await client.query('ROLLBACK'); } catch (e) {}
+      try { 
+        await client.query('ROLLBACK'); 
+      } catch (error_) { 
+        console.error('Rollback error', error_);
+      }
     }
     console.error(err);
     res.status(500).json({ message: 'Server error' });

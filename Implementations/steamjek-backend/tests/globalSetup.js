@@ -11,7 +11,7 @@
 const path = require('node:path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
-module.exports = async () => {
+const globalSetup = async function globalSetup() {
   let Pool;
   if (process.env.DB_HOST === 'localhost' || process.env.NODE_ENV === 'test') {
     Pool = require('pg').Pool; // standard postgres via TCP inside GitHub test container
@@ -86,3 +86,4 @@ module.exports = async () => {
     await pool.end();
   }
 };
+module.exports = globalSetup;
