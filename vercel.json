@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/",
+      "destination": "/Implementations/steamjek-frontend/page1_store.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/Implementations/steamjek-frontend/$1"
+    }
+  ]
+}

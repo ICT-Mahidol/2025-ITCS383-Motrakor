@@ -58,3 +58,14 @@
 | **Use For** | Creating unit tests for the functions. |
 | **Accepted / Rejected** | Accepted unit test files that cover the validity of the tested functions. |
 | **Verification** | Unit tests to validate logical functions without raising errors. |
+
+---
+
+## Log 6
+
+| | |
+|---|---|
+| **Prompt** | Resolve SonarQube bugs, open handles with jest tests, code smells including CSS duplication natively, and fix the 500 error on the Vercel marketplace API. |
+| **Use For** | Fixing CI/CD pipelines, restoring 98% code coverage natively, and eliminating all static analysis code smells (e.g., contrast accessibility, top-level await warnings, unhandled rollup exceptions, duplicate CSS selectors). |
+| **Accepted / Rejected** | Accepted the implementations linking standard TCP PostgreSQL for Jest local actions (`db/index.js`), adding the `ws` package to root `package.json`, and cleaning overlapping CSS rules rather than using arbitrary `sonar.cpd.exclusions` ignores. |
+| **Verification** | Ran `npm run test:coverage` locally and triggered SonarCloud to verify 180 passing tests natively with 98.47% test coverage without "open handle" warnings. |
